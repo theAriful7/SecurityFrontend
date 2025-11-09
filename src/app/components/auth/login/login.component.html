@@ -1,0 +1,113 @@
+<div class="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+  <div class="sm:mx-auto sm:w-full sm:max-w-md">
+    <div class="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+      <!-- Header -->
+      <div class="text-center">
+        <h2 class="text-3xl font-bold text-gray-900 mb-2">Welcome Back</h2>
+        <p class="text-gray-600">Sign in to your account</p>
+      </div>
+
+      <!-- Error Message -->
+      <div *ngIf="errorMessage"
+        class="mt-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex items-center justify-between">
+        <span class="text-sm">{{ errorMessage }}</span>
+        <button (click)="errorMessage = ''" class="text-red-500 hover:text-red-700">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="mt-6 space-y-6">
+        <!-- Email Field -->
+        <div>
+          <label for="email" class="block text-sm font-medium text-gray-700">Email Address</label>
+          <div class="mt-1">
+            <input id="email" type="email" formControlName="email" autocomplete="email"
+              class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              [class.border-red-300]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched"
+              [class.focus:ring-red-500]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched"
+              [class.focus:border-red-500]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched"
+              placeholder="Enter your email">
+          </div>
+          <div *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched"
+            class="mt-1 text-sm text-red-600">
+            <span *ngIf="loginForm.get('email')?.errors?.['required']">Email is required</span>
+            <span *ngIf="loginForm.get('email')?.errors?.['email']">Please enter a valid email address</span>
+          </div>
+        </div>
+
+        <!-- Password Field -->
+        <div>
+          <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+          <div class="mt-1">
+            <input id="password" type="password" formControlName="password" autocomplete="current-password"
+              class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              [class.border-red-300]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
+              [class.focus:ring-red-500]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
+              [class.focus:border-red-500]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
+              placeholder="Enter your password">
+          </div>
+          <div *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
+            class="mt-1 text-sm text-red-600">
+            <span *ngIf="loginForm.get('password')?.errors?.['required']">Password is required</span>
+            <span *ngIf="loginForm.get('password')?.errors?.['minlength']">Password must be at least 6 characters
+              long</span>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div>
+          <button type="submit" [disabled]="loginForm.invalid || isLoading"
+            class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition duration-200">
+            <span *ngIf="isLoading" class="absolute left-0 inset-y-0 flex items-center pl-3">
+              <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
+                viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                </path>
+              </svg>
+            </span>
+            {{ isLoading ? 'Signing in...' : 'Sign in' }}
+          </button>
+        </div>
+
+        <!-- Register Link -->
+        <div class="text-center">
+          <p class="text-sm text-gray-600">
+            Don't have an account?
+            <a routerLink="/register"
+              class="font-medium text-blue-600 hover:text-blue-500 ml-1 transition duration-200">
+              Sign up here
+            </a>
+          </p>
+        </div>
+      </form>
+
+      <!-- Demo Accounts (Optional - remove in production) -->
+      <div class="mt-8 border-t border-gray-200 pt-6">
+        <div class="text-center">
+          <h3 class="text-sm font-medium text-gray-500 mb-4">Demo Accounts (For Testing)</h3>
+          <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div class="bg-gray-50 p-3 rounded-lg">
+              <p class="text-xs font-medium text-gray-900">Admin</p>
+              <p class="text-xs text-gray-600">admin@demo.com</p>
+              <p class="text-xs text-gray-600">password: admin123</p>
+            </div>
+            <div class="bg-gray-50 p-3 rounded-lg">
+              <p class="text-xs font-medium text-gray-900">Vendor</p>
+              <p class="text-xs text-gray-600">vendor@demo.com</p>
+              <p class="text-xs text-gray-600">password: vendor123</p>
+            </div>
+            <div class="bg-gray-50 p-3 rounded-lg">
+              <p class="text-xs font-medium text-gray-900">Customer</p>
+              <p class="text-xs text-gray-600">customer@demo.com</p>
+              <p class="text-xs text-gray-600">password: customer123</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
