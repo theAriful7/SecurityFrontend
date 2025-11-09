@@ -8,6 +8,7 @@ import { AuthGuard } from './guards/auth.guard';
 import { RoleGuard } from './guards/role.guard';
 import { UserRole } from './models/user.model';
 import { DashboardComponent } from './components/vendor/dashboard/dashboard.component';
+import { CustomerDashboardComponent } from './components/customer/customer-dashboard/customer-dashboard.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -16,6 +17,11 @@ const routes: Routes = [
   { 
     path: 'profile', 
     component: ProfileComponent, 
+    canActivate: [AuthGuard] 
+  },
+    { 
+    path: 'customer', 
+    component: CustomerDashboardComponent, 
     canActivate: [AuthGuard] 
   },
   { 

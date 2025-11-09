@@ -10,6 +10,7 @@ import { DashboardComponent } from './components/vendor/dashboard/dashboard.comp
 import { AdminDashboardComponent } from './components/admin/admin-dashboard/admin-dashboard.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'; 
 import { HttpClientModule } from '@angular/common/http';
+import { CustomerDashboardComponent } from './components/customer/customer-dashboard/customer-dashboard.component';
 
 
 @NgModule({
@@ -19,7 +20,8 @@ import { HttpClientModule } from '@angular/common/http';
     RegisterComponent,
     ProfileComponent,
     DashboardComponent,
-    AdminDashboardComponent
+    AdminDashboardComponent,
+    CustomerDashboardComponent
   ],
   imports: [
     BrowserModule,

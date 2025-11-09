@@ -14,7 +14,7 @@ export class UserService {
   constructor(private http: HttpClient) { }
 
   getCurrentUser(): Observable<User> {
-    return this.http.get<User>(`${this.apiUrl}/users/me`);
+    return this.http.get<User>(`${this.apiUrl}/users/profile`);
   }
 
   getUserById(id: number): Observable<User> {
@@ -33,3 +33,4 @@ export class UserService {
     return this.http.delete<void>(`${this.apiUrl}/users/${id}`);
   }
 }
+

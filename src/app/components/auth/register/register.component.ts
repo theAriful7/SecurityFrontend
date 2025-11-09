@@ -15,7 +15,6 @@ registerForm: FormGroup;
   errorMessage: string = '';
   successMessage: string = '';
   isLoading: boolean = false;
-  userRoles = Object.values(UserRole);
 
   constructor(
     private fb: FormBuilder,
@@ -26,9 +25,9 @@ registerForm: FormGroup;
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
       firstName: ['', [Validators.required]],
-      lastName: [''],
-      phone: [''],
-      role: [UserRole.CUSTOMER, [Validators.required]]
+      lastName: ['', [Validators.required]],
+      phone: ['', [Validators.required]]
+      // Role is automatically set to CUSTOMER in the backend
     });
   }
 
@@ -38,30 +37,29 @@ registerForm: FormGroup;
       this.errorMessage = '';
       this.successMessage = '';
 
-      const registerRequest: RegisterRequest = this.registerForm.value;
+      const registerRequest: RegisterRequest = {
+        ...this.registerForm.value,
+        role: UserRole.CUSTOMER // Force CUSTOMER role for all new registrations
+      };
 
       this.authService.register(registerRequest).subscribe({
         next: (response) => {
           this.isLoading = false;
-          this.successMessage = response.message || 'Registration successful! Please login.';
+          this.successMessage = response.message || 'Registration successful! Please check your email to verify your account.';
           
-          // If vendor registration, redirect to vendor setup
-          if (registerRequest.role === UserRole.VENDOR) {
-            setTimeout(() => {
-              this.router.navigate(['/vendor/register'], { 
-                queryParams: { email: registerRequest.email } 
-              });
-            }, 2000);
-          } else {
-            setTimeout(() => {
-              this.router.navigate(['/login']);
-            }, 2000);
-          }
+          setTimeout(() => {
+            this.router.navigate(['/login']);
+          }, 3000);
         },
         error: (error) => {
           this.isLoading = false;
           this.errorMessage = error.error?.message || 'Registration failed. Please try again.';
         }
+      });
+    } else {
+      // Mark all fields as touched to trigger validation messages
+      Object.keys(this.registerForm.controls).forEach(key => {
+        this.registerForm.get(key)?.markAsTouched();
       });
     }
   }
