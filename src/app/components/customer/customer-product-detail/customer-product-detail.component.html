@@ -1,1 +1,269 @@
-<p>customer-product-detail works!</p>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <!-- Loading State -->
+  <div *ngIf="loading" class="text-center py-12">
+    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
+    <p class="text-gray-600 mt-4">Loading product...</p>
+  </div>
+
+  <!-- Product Details -->
+  <div *ngIf="!loading && product" class="bg-white rounded-lg shadow-lg overflow-hidden">
+    <div class="lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start p-8">
+      <!-- Product Images -->
+      <div class="flex flex-col-reverse">
+        <!-- Image Gallery -->
+        <div class="hidden mt-6 w-full max-w-2xl mx-auto sm:block lg:max-w-none">
+          <div class="grid grid-cols-4 gap-2" *ngIf="product.images && product.images.length > 1">
+            <button *ngFor="let image of product.images" 
+                    class="relative h-24 bg-white rounded-md flex items-center justify-center text-sm font-medium uppercase text-gray-900 cursor-pointer hover:bg-gray-50 focus:outline-none focus:ring focus:ring-offset-4 focus:ring-opacity-50 border border-gray-200">
+              <img [src]="image.filePath" [alt]="image.altText || product.name"
+                   (error)="onImageError($event)"
+                   class="h-full w-full object-cover object-center rounded-md">
+            </button>
+          </div>
+        </div>
+
+        <!-- Main Image -->
+        <div class="w-full aspect-w-1 aspect-h-1 bg-gray-100 rounded-lg overflow-hidden">
+          <img [src]="getPrimaryImage(product.images)" 
+               [alt]="product.name"
+               (error)="onImageError($event)"
+               class="w-full h-full object-center object-cover">
+        </div>
+      </div>
+
+      <!-- Product Info -->
+      <div class="mt-10 px-4 sm:px-0 sm:mt-16 lg:mt-0">
+        <!-- Product Title -->
+        <h1 class="text-3xl font-extrabold tracking-tight text-gray-900">{{ product.name }}</h1>
+
+        <!-- Vendor Info -->
+        <div class="mt-2">
+          <p class="text-sm text-gray-500">Sold by: <span class="font-medium text-gray-700">{{ product.vendorName }}</span></p>
+        </div>
+
+        <!-- Rating -->
+        <div class="mt-3 flex items-center">
+          <div class="flex items-center">
+            <div class="flex items-center">
+              <span *ngFor="let star of getStarRating(averageRating)" class="text-yellow-400">
+                <i *ngIf="star === 'full'" class="fas fa-star"></i>
+                <i *ngIf="star === 'half'" class="fas fa-star-half-alt"></i>
+                <i *ngIf="star === 'empty'" class="far fa-star"></i>
+              </span>
+            </div>
+            <p class="ml-2 text-sm text-gray-500">{{ averageRating.toFixed(1) }} ({{ totalReviews }} reviews)</p>
+          </div>
+        </div>
+
+        <!-- Price -->
+        <div class="mt-3">
+          <div class="flex items-center space-x-3">
+            <p class="text-3xl font-bold text-gray-900">
+              ${{ calculateDiscountPrice(product.price, product.discount) }}
+            </p>
+            <p *ngIf="product.discount" class="text-xl text-gray-500 line-through">
+              ${{ product.price }}
+            </p>
+            <div *ngIf="product.discount" class="bg-red-100 text-red-800 px-2 py-1 rounded text-sm font-bold">
+              Save {{ product.discount }}%
+            </div>
+          </div>
+        </div>
+
+        <!-- Stock Status -->
+        <div class="mt-3">
+          <span [class]="getStockStatus(product.stock).class" class="text-sm font-medium">
+            {{ getStockStatus(product.stock).text }}
+          </span>
+        </div>
+
+        <!-- Quantity and Add to Cart -->
+        <div class="mt-8 border-t border-gray-200 pt-8">
+          <div class="flex items-center space-x-4">
+            <!-- Quantity Selector -->
+            <div>
+              <label for="quantity" class="block text-sm font-medium text-gray-700 mb-1">Quantity</label>
+              <select id="quantity" [(ngModel)]="selectedQuantity"
+                      class="block w-20 pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md border">
+                <option *ngFor="let qty of [1,2,3,4,5,6,7,8,9,10]" [value]="qty">{{ qty }}</option>
+              </select>
+            </div>
+
+            <!-- Add to Cart Button -->
+            <div class="flex-1">
+              <button (click)="addToCart()"
+                      [disabled]="product.stock === 0 || addingToCart"
+                      class="w-full bg-blue-600 border border-transparent rounded-md py-3 px-8 flex items-center justify-center text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors">
+                <span *ngIf="addingToCart">
+                  <i class="fas fa-spinner fa-spin mr-2"></i>
+                  Adding...
+                </span>
+                <span *ngIf="!addingToCart">
+                  <i class="fas fa-shopping-cart mr-2"></i>
+                  Add to Cart
+                </span>
+              </button>
+            </div>
+
+            <!-- Wishlist Button -->
+            <button type="button"
+                    class="p-3 text-gray-400 hover:text-red-500 border border-gray-300 rounded-md hover:border-red-300 transition-colors">
+              <i class="far fa-heart text-xl"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Features -->
+        <div class="mt-8 border-t border-gray-200 pt-8">
+          <div class="grid grid-cols-2 gap-4">
+            <div class="flex items-center">
+              <i class="fas fa-shipping-fast text-green-500 mr-2"></i>
+              <span class="text-sm text-gray-600">Free shipping</span>
+            </div>
+            <div class="flex items-center">
+              <i class="fas fa-undo-alt text-blue-500 mr-2"></i>
+              <span class="text-sm text-gray-600">30-day returns</span>
+            </div>
+            <div class="flex items-center">
+              <i class="fas fa-shield-alt text-purple-500 mr-2"></i>
+              <span class="text-sm text-gray-600">2-year warranty</span>
+            </div>
+            <div class="flex items-center">
+              <i class="fas fa-headset text-orange-500 mr-2"></i>
+              <span class="text-sm text-gray-600">24/7 support</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabs Section -->
+    <div class="border-t border-gray-200 mt-8">
+      <div class="max-w-7xl mx-auto px-8">
+        <div class="border-b border-gray-200">
+          <nav class="-mb-px flex space-x-8">
+            <button (click)="setActiveTab('description')"
+                    [class]="activeTab === 'description' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+                    class="whitespace-nowrap py-6 border-b-2 font-medium text-sm">
+              Description
+            </button>
+            <button (click)="setActiveTab('specifications')"
+                    [class]="activeTab === 'specifications' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+                    class="whitespace-nowrap py-6 border-b-2 font-medium text-sm">
+              Specifications
+            </button>
+            <button (click)="setActiveTab('reviews')"
+                    [class]="activeTab === 'reviews' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+                    class="whitespace-nowrap py-6 border-b-2 font-medium text-sm">
+              Reviews ({{ totalReviews }})
+            </button>
+          </nav>
+        </div>
+
+        <!-- Tab Content -->
+        <div class="py-8">
+          <!-- Description Tab -->
+          <div *ngIf="activeTab === 'description'" class="prose prose-lg text-gray-500">
+            <p>{{ product.description }}</p>
+          </div>
+
+          <!-- Specifications Tab -->
+          <div *ngIf="activeTab === 'specifications' && product.specifications && product.specifications.length > 0" class="space-y-4">
+            <div *ngFor="let spec of product.specifications" 
+                 class="flex justify-between py-3 border-b border-gray-100">
+              <dt class="font-medium text-gray-900">{{ spec.key }}</dt>
+              <dd class="text-gray-500">{{ spec.value }}</dd>
+            </div>
+          </div>
+
+          <!-- Reviews Tab -->
+          <div *ngIf="activeTab === 'reviews'" class="space-y-8">
+            <!-- Rating Summary -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div class="text-center">
+                <div class="text-4xl font-bold text-gray-900">{{ averageRating.toFixed(1) }}</div>
+                <div class="flex justify-center mt-1">
+                  <span *ngFor="let star of getStarRating(averageRating)" class="text-yellow-400 text-sm">
+                    <i *ngIf="star === 'full'" class="fas fa-star"></i>
+                    <i *ngIf="star === 'half'" class="fas fa-star-half-alt"></i>
+                    <i *ngIf="star === 'empty'" class="far fa-star"></i>
+                  </span>
+                </div>
+                <p class="text-sm text-gray-500 mt-1">{{ totalReviews }} reviews</p>
+              </div>
+
+              <!-- Rating Breakdown -->
+              <div class="md:col-span-2">
+                <div *ngFor="let rating of [5,4,3,2,1]" class="flex items-center text-sm">
+                  <span class="w-12 text-gray-600">{{ rating }} star</span>
+                  <div class="flex-1 mx-2 h-2 bg-gray-200 rounded-full overflow-hidden">
+                    <div class="h-full bg-yellow-400" [style.width.%]="getRatingPercentage(rating)"></div>
+                  </div>
+                  <span class="w-12 text-gray-600 text-right">{{ getRatingPercentage(rating).toFixed(0) }}%</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Reviews List -->
+            <div class="space-y-6">
+              <div *ngFor="let review of reviews" class="border-b border-gray-200 pb-6">
+                <div class="flex items-center mb-2">
+                  <div class="flex items-center">
+                    <span *ngFor="let star of getStarRating(review.rating)" class="text-yellow-400 text-sm">
+                      <i *ngIf="star === 'full'" class="fas fa-star"></i>
+                      <i *ngIf="star === 'empty'" class="far fa-star"></i>
+                    </span>
+                  </div>
+                  <span class="ml-2 text-sm font-medium text-gray-900">{{ review.userName }}</span>
+                </div>
+                <p class="text-gray-600 mb-2">{{ review.comment }}</p>
+                <p class="text-sm text-gray-500">{{ review.createdAt | date:'mediumDate' }}</p>
+              </div>
+
+              <div *ngIf="reviews.length === 0" class="text-center py-8">
+                <i class="fas fa-comment text-4xl text-gray-300 mb-4"></i>
+                <p class="text-gray-500">No reviews yet. Be the first to review this product!</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Related Products -->
+  <div *ngIf="!loading && relatedProducts.length > 0" class="mt-16">
+    <h2 class="text-2xl font-bold text-gray-900 mb-8">Related Products</h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div *ngFor="let relatedProduct of relatedProducts" 
+           class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+        <div class="relative h-48 bg-gray-200">
+          <img [src]="getPrimaryImage(relatedProduct.images)" 
+               [alt]="relatedProduct.name"
+               (error)="onImageError($event)"
+               class="w-full h-full object-cover">
+          <div *ngIf="relatedProduct.discount" 
+               class="absolute top-3 left-3 bg-red-500 text-white px-2 py-1 rounded text-sm font-bold">
+            -{{ relatedProduct.discount }}%
+          </div>
+        </div>
+        <div class="p-4">
+          <h3 class="font-semibold text-gray-900 mb-2 truncate">{{ relatedProduct.name }}</h3>
+          <p class="text-xs text-gray-500 mb-2">Sold by: {{ relatedProduct.vendorName }}</p>
+          <div class="flex items-center space-x-2 mb-3">
+            <span class="text-lg font-bold text-gray-900">
+              ${{ calculateDiscountPrice(relatedProduct.price, relatedProduct.discount) }}
+            </span>
+            <span *ngIf="relatedProduct.discount" class="text-sm text-gray-500 line-through">
+              ${{ relatedProduct.price }}
+            </span>
+          </div>
+          <button [routerLink]="['/products', relatedProduct.id]"
+                  class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg font-medium transition-colors">
+            View Details
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

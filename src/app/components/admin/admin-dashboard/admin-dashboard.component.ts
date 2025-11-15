@@ -38,14 +38,14 @@ export class AdminDashboardComponent implements OnInit {
 
   loadDashboardData(): void {
     // Load users
-    this.userService.getUsersByRole('CUSTOMER').subscribe(users => {
-      this.stats.totalUsers = users.length;
-    });
+    // this.userService.getUsersByRole('CUSTOMER').subscribe(users => {
+    //   this.stats.totalUsers = users.length;
+    // });
 
     // Load products
-    this.productService.getTotalProductCount().subscribe(count => {
-      this.stats.totalProducts = count;
-    });
+    // this.productService.getTotalProductCount().subscribe(count => {
+    //   this.stats.totalProducts = count;
+    // });
 
     // Load orders
     this.orderService.getAllOrders().subscribe(orders => {

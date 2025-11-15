@@ -1,1 +1,352 @@
-<p>customer-product-list works!</p>
+<div class="min-h-screen bg-gray-50">
+  <!-- Hero Section -->
+  <div class="bg-gradient-to-r from-blue-600 to-purple-700 text-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <div class="text-center">
+        <h1 class="text-4xl md:text-5xl font-bold mb-4">Discover Amazing Products</h1>
+        <p class="text-xl text-blue-100 mb-8">Shop from multiple vendors with the best prices and quality</p>
+        
+        <!-- Main Search -->
+        <div class="max-w-2xl mx-auto">
+          <div class="relative">
+            <input type="text" [(ngModel)]="searchTerm" 
+                   (keyup.enter)="onSearch()"
+                   placeholder="Search for products, brands, or categories..."
+                   class="w-full px-6 py-4 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-4 focus:ring-blue-300 shadow-lg">
+            <button (click)="onSearch()" 
+                    class="absolute right-2 top-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md transition-colors">
+              <i class="fas fa-search"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="flex flex-col lg:flex-row gap-8">
+      <!-- Filters Sidebar -->
+      <aside class="lg:w-80 flex-shrink-0">
+        <div class="bg-white rounded-2xl shadow-lg p-6 sticky top-8 border border-gray-100">
+          <!-- Categories -->
+          <div class="mb-8">
+            <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center">
+              <i class="fas fa-tags text-blue-600 mr-2"></i>
+              Categories
+            </h3>
+            <div class="space-y-2">
+              <label class="flex items-center space-x-3 cursor-pointer group">
+                <input type="radio" name="category" [value]="null" 
+                       [checked]="selectedCategory === null"
+                       (change)="selectedCategory = null; onCategoryChange()"
+                       class="text-blue-600 focus:ring-blue-500">
+                <span class="text-gray-700 group-hover:text-blue-600 transition-colors">All Categories</span>
+              </label>
+              <label *ngFor="let category of categories" 
+                     class="flex items-center space-x-3 cursor-pointer group">
+                <input type="radio" name="category" [value]="category.id"
+                       [checked]="selectedCategory === category.id"
+                       (change)="selectedCategory = category.id; onCategoryChange()"
+                       class="text-blue-600 focus:ring-blue-500">
+                <span class="text-gray-700 group-hover:text-blue-600 transition-colors">{{ category.name }}</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Price Range -->
+          <div class="mb-8">
+            <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center">
+              <i class="fas fa-filter text-blue-600 mr-2"></i>
+              Price Range
+            </h3>
+            <div class="flex items-center space-x-3">
+              <div class="flex-1">
+                <label class="text-sm text-gray-600 mb-1 block">Min Price</label>
+                <input type="number" [(ngModel)]="priceRange.min" 
+                       (change)="onPriceRangeChange()"
+                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+              </div>
+              <span class="text-gray-500 mt-6">-</span>
+              <div class="flex-1">
+                <label class="text-sm text-gray-600 mb-1 block">Max Price</label>
+                <input type="number" [(ngModel)]="priceRange.max"
+                       (change)="onPriceRangeChange()"
+                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+              </div>
+            </div>
+          </div>
+
+          <!-- Sort Options -->
+          <div>
+            <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center">
+              <i class="fas fa-sort text-blue-600 mr-2"></i>
+              Sort By
+            </h3>
+            <select [(ngModel)]="sortBy" (change)="onSortChange()" 
+                    class="w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 mb-3 bg-white">
+              <option value="name">Name</option>
+              <option value="price">Price</option>
+              <option value="createdAt">Newest</option>
+            </select>
+            <select [(ngModel)]="sortDirection" (change)="onSortChange()"
+                    class="w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+              <option value="asc">Ascending</option>
+              <option value="desc">Descending</option>
+            </select>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="flex-1">
+        <!-- Featured Sections Navigation -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 mb-8 border border-gray-100">
+          <div class="flex flex-wrap gap-2 md:gap-4">
+            <button (click)="setActiveSection('all')"
+                    [class]="activeSection === 'all' ? 
+                             'bg-blue-600 text-white shadow-lg transform scale-105' : 
+                             'bg-gray-100 text-gray-700 hover:bg-gray-200'"
+                    class="px-6 py-3 rounded-xl font-semibold transition-all duration-300 flex items-center">
+              <i class="fas fa-th-large mr-2"></i>
+              All Products
+            </button>
+            <button (click)="setActiveSection('trending')"
+                    [class]="activeSection === 'trending' ? 
+                             'bg-orange-600 text-white shadow-lg transform scale-105' : 
+                             'bg-gray-100 text-gray-700 hover:bg-gray-200'"
+                    class="px-6 py-3 rounded-xl font-semibold transition-all duration-300 flex items-center">
+              <i class="fas fa-fire mr-2"></i>
+              Trending
+            </button>
+            <button (click)="setActiveSection('bestsellers')"
+                    [class]="activeSection === 'bestsellers' ? 
+                             'bg-green-600 text-white shadow-lg transform scale-105' : 
+                             'bg-gray-100 text-gray-700 hover:bg-gray-200'"
+                    class="px-6 py-3 rounded-xl font-semibold transition-all duration-300 flex items-center">
+              <i class="fas fa-trophy mr-2"></i>
+              Best Sellers
+            </button>
+            <button (click)="setActiveSection('featured')"
+                    [class]="activeSection === 'featured' ? 
+                             'bg-purple-600 text-white shadow-lg transform scale-105' : 
+                             'bg-gray-100 text-gray-700 hover:bg-gray-200'"
+                    class="px-6 py-3 rounded-xl font-semibold transition-all duration-300 flex items-center">
+              <i class="fas fa-star mr-2"></i>
+              Featured
+            </button>
+            <button (click)="setActiveSection('new')"
+                    [class]="activeSection === 'new' ? 
+                             'bg-indigo-600 text-white shadow-lg transform scale-105' : 
+                             'bg-gray-100 text-gray-700 hover:bg-gray-200'"
+                    class="px-6 py-3 rounded-xl font-semibold transition-all duration-300 flex items-center">
+              <i class="fas fa-bolt mr-2"></i>
+              New Arrivals
+            </button>
+          </div>
+        </div>
+
+        <!-- Results Info -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 mb-6 border border-gray-100">
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h2 class="text-2xl font-bold text-gray-900 capitalize">
+                <span *ngIf="activeSection === 'all'">All Products</span>
+                <span *ngIf="activeSection === 'trending'">Trending Products</span>
+                <span *ngIf="activeSection === 'bestsellers'">Best Sellers</span>
+                <span *ngIf="activeSection === 'featured'">Featured Products</span>
+                <span *ngIf="activeSection === 'new'">New Arrivals</span>
+              </h2>
+              <p class="text-gray-600 mt-1">
+                Showing {{ getDisplayProducts().length }} 
+                <span *ngIf="activeSection === 'all'">of {{ totalProducts }}</span>
+                products
+              </p>
+            </div>
+            <div class="mt-4 sm:mt-0">
+              <div class="flex items-center space-x-4 text-sm text-gray-600">
+                <span class="flex items-center">
+                  <i class="fas fa-store mr-1"></i>
+                  Multiple Vendors
+                </span>
+                <span class="flex items-center">
+                  <i class="fas fa-shipping-fast mr-1"></i>
+                  Free Shipping
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Loading State -->
+        <div *ngIf="loading || featuredLoading" class="text-center py-16">
+          <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-500 mx-auto mb-4"></div>
+          <p class="text-gray-600 text-lg">Loading amazing products...</p>
+        </div>
+
+        <!-- Products Grid -->
+        <div *ngIf="!loading && !featuredLoading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
+          <div *ngFor="let product of getDisplayProducts()" 
+               class="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 border border-gray-100 group">
+            <!-- Product Image -->
+            <div class="relative h-60 bg-gray-100 overflow-hidden">
+              <img [src]="getPrimaryImage(product.images)" 
+                   [alt]="product.name"
+                   (error)="onImageError($event)"
+                   class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+              
+              <!-- Discount Badge -->
+              <div *ngIf="product.discount" 
+                   class="absolute top-3 left-3 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg">
+                -{{ product.discount }}%
+              </div>
+              
+              <!-- Action Buttons -->
+              <div class="absolute top-3 right-3 flex flex-col space-y-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <button (click)="addToWishlist(product)"
+                        class="w-10 h-10 bg-white rounded-full shadow-md flex items-center justify-center hover:bg-red-50 hover:text-red-600 transition-colors">
+                  <i class="far fa-heart"></i>
+                </button>
+                <button (click)="addToCart(product)"
+                        [disabled]="product.stock === 0"
+                        class="w-10 h-10 bg-white rounded-full shadow-md flex items-center justify-center hover:bg-green-50 hover:text-green-600 transition-colors disabled:opacity-50">
+                  <i class="fas fa-shopping-cart"></i>
+                </button>
+              </div>
+
+              <!-- Stock Status Overlay -->
+              <div *ngIf="product.stock === 0" 
+                   class="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center">
+                <span class="text-white font-bold text-lg bg-red-500 px-4 py-2 rounded-full">Out of Stock</span>
+              </div>
+            </div>
+
+            <!-- Product Info -->
+            <div class="p-5">
+              <!-- Vendor -->
+              <div class="mb-2">
+                <span class="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded-full">
+                  {{ product.vendorName }}
+                </span>
+              </div>
+
+              <!-- Product Name -->
+              <h3 class="font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors" 
+                  [title]="product.name">
+                {{ product.name }}
+              </h3>
+
+              <!-- Description -->
+              <p class="text-gray-600 text-sm mb-3 line-clamp-2">
+                {{ product.description }}
+              </p>
+
+              <!-- Rating -->
+              <div class="flex items-center mb-3">
+                <div class="flex text-yellow-400">
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star-half-alt"></i>
+                </div>
+                <span class="text-sm text-gray-500 ml-2">({{ product.rating || '4.5' }})</span>
+              </div>
+
+              <!-- Price -->
+              <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center space-x-2">
+                  <span class="text-xl font-bold text-gray-900">
+                    ${{ calculateDiscountPrice(product.price, product.discount) }}
+                  </span>
+                  <span *ngIf="product.discount" class="text-sm text-gray-500 line-through">
+                    ${{ product.price }}
+                  </span>
+                </div>
+                <span [class]="product.stock > 0 ? 'text-green-600' : 'text-red-600'" 
+                      class="text-sm font-medium">
+                  {{ product.stock > 0 ? (product.stock > 10 ? 'In Stock' : 'Limited Stock') : 'Out of Stock' }}
+                </span>
+              </div>
+
+              <!-- Actions -->
+              <div class="flex space-x-2">
+                <button [routerLink]="['/products', product.id]"
+                        class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-xl font-semibold transition-colors flex items-center justify-center">
+                  <i class="fas fa-eye mr-2"></i>
+                  View Details
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- No Products -->
+        <div *ngIf="!loading && !featuredLoading && getDisplayProducts().length === 0" 
+             class="text-center py-16 bg-white rounded-2xl shadow-lg border border-gray-100">
+          <div class="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <i class="fas fa-search text-gray-400 text-3xl"></i>
+          </div>
+          <h3 class="text-2xl font-bold text-gray-600 mb-2">No products found</h3>
+          <p class="text-gray-500 mb-6">Try adjusting your search criteria or browse different categories</p>
+          <button (click)="setActiveSection('all'); searchTerm = ''; selectedCategory = null; loadProducts()"
+                  class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-xl font-semibold transition-colors">
+            Browse All Products
+          </button>
+        </div>
+
+        <!-- Pagination (Only for All Products) -->
+<!-- Pagination (Only for All Products) -->
+<div *ngIf="!loading && activeSection === 'all' && totalPages > 1" 
+     class="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+  <div class="flex justify-center items-center space-x-2">
+    <button (click)="onPageChange(currentPage - 1)" 
+            [disabled]="currentPage === 0"
+            class="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors flex items-center">
+      <i class="fas fa-chevron-left mr-2"></i>
+      Previous
+    </button>
+    
+    <div class="flex space-x-1">
+      <!-- Show first page -->
+      <button *ngIf="currentPage > 2" 
+              (click)="onPageChange(0)"
+              class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+        1
+      </button>
+      
+      <!-- Show ellipsis if needed -->
+      <span *ngIf="currentPage > 3" class="px-2 py-2 text-gray-500">...</span>
+      
+      <!-- Show pages around current page -->
+      <ng-container *ngFor="let page of getVisiblePages()">
+        <button (click)="onPageChange(page)"
+                [class]="page === currentPage ? 
+                         'bg-blue-600 text-white px-4 py-2 rounded-lg shadow-lg' : 
+                         'px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors'">
+          {{ page + 1 }}
+        </button>
+      </ng-container>
+      
+      <!-- Show ellipsis if needed -->
+      <span *ngIf="currentPage < totalPages - 4" class="px-2 py-2 text-gray-500">...</span>
+      
+      <!-- Show last page -->
+      <button *ngIf="currentPage < totalPages - 3" 
+              (click)="onPageChange(totalPages - 1)"
+              class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+        {{ totalPages }}
+      </button>
+    </div>
+    
+    <button (click)="onPageChange(currentPage + 1)"
+            [disabled]="currentPage === totalPages - 1"
+            class="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors flex items-center">
+      Next
+      <i class="fas fa-chevron-right ml-2"></i>
+    </button>
+  </div>
+</div>
+      </main>
+    </div>
+  </div>
+</div>

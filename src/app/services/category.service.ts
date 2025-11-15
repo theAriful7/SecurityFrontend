@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../environments/environment';
 import { CategoryRequestDTO, CategoryResponseDTO } from '../models/category.model';
+import { SubCategoryResponseDTO } from '../models/sub-category.model';
 
 @Injectable({
   providedIn: 'root'
@@ -12,6 +13,10 @@ export class CategoryService {
    private apiUrl = environment.apiUrl;
 
   constructor(private http: HttpClient) { }
+
+  getSubCategoriesByCategory(categoryId: number): Observable<SubCategoryResponseDTO[]> {
+  return this.http.get<SubCategoryResponseDTO[]>(`${this.apiUrl}/categories/${categoryId}/subcategories`);
+}
 
   createCategory(category: CategoryRequestDTO): Observable<CategoryResponseDTO> {
     return this.http.post<CategoryResponseDTO>(`${this.apiUrl}/categories`, category);

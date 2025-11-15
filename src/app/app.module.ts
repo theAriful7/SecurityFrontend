@@ -19,7 +19,6 @@ import { CustomerProductListComponent } from './components/customer/customer-pro
 import { CustomerProductDetailComponent } from './components/customer/customer-product-detail/customer-product-detail.component';
 import { CartComponent } from './components/customer/cart/cart.component';
 import { CheckoutComponent } from './components/customer/checkout/checkout.component';
-import { VendorProductComponent } from './components/vendor/vendor-product/vendor-product.component';
 import { OrdersComponent } from './components/vendor/orders/orders.component';
 import { AddProductComponent } from './components/vendor/add-product/add-product.component';
 import { UsersComponent } from './components/admin/users/users.component';
@@ -27,6 +26,9 @@ import { VendorsComponent } from './components/admin/vendors/vendors.component';
 import { CategoriesComponent } from './components/admin/categories/categories.component';
 import { AdminOrdersListComponent } from './components/admin/admin-orders-list/admin-orders-list.component';
 import { UserManagementComponentComponent } from './components/admin/user-management-component/user-management-component.component';
+import { HomeComponent } from './components/home/home.component';
+import { VendorProfileComponent } from './components/vendor/vendor-profile/vendor-profile.component';
+import { VendorProductsComponent } from './components/vendor/vendor-products/vendor-products.component';
 
 
 @NgModule({
@@ -46,7 +48,6 @@ import { UserManagementComponentComponent } from './components/admin/user-manage
     CustomerProductDetailComponent,
     CartComponent,
     CheckoutComponent,
-    VendorProductComponent,
     OrdersComponent,
     AddProductComponent,
     UsersComponent,
@@ -54,6 +55,9 @@ import { UserManagementComponentComponent } from './components/admin/user-manage
     CategoriesComponent,
     AdminOrdersListComponent,
     UserManagementComponentComponent,
+    HomeComponent,
+    VendorProfileComponent,
+    VendorProductsComponent,
 
     
   ],

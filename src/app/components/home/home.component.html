@@ -1,0 +1,334 @@
+<div class="min-h-screen">
+  <!-- Hero Section -->
+  <section class="relative bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-700 text-white overflow-hidden">
+    <!-- Background Pattern -->
+    <div class="absolute inset-0 bg-black opacity-10"></div>
+    <div class="absolute top-0 left-0 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
+    <div class="absolute top-0 right-0 w-72 h-72 bg-yellow-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
+    <div class="absolute -bottom-8 left-20 w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
+    
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 lg:py-32">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        <!-- Hero Content -->
+        <div class="text-center lg:text-left">
+          <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6">
+            Discover Amazing
+            <span class="text-yellow-300">Products</span>
+            From Multiple Vendors
+          </h1>
+          <p class="text-xl md:text-2xl text-blue-100 mb-8 leading-relaxed">
+            Your one-stop marketplace for quality products, competitive prices, and trusted vendors all in one place.
+          </p>
+          <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+            <button routerLink="/products" 
+                    class="bg-yellow-400 hover:bg-yellow-300 text-gray-900 px-8 py-4 rounded-xl font-bold text-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl">
+              <i class="fas fa-shopping-bag mr-2"></i>
+              Shop Now
+            </button>
+            <button class="border-2 border-white hover:bg-white hover:text-blue-600 text-white px-8 py-4 rounded-xl font-bold text-lg transition-all duration-300 transform hover:scale-105">
+              <i class="fas fa-play-circle mr-2"></i>
+              Watch Demo
+            </button>
+          </div>
+          
+          <!-- Stats -->
+          <div class="mt-12 grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div *ngFor="let stat of stats" class="text-center">
+              <div class="text-2xl md:text-3xl font-bold">{{ stat.number }}</div>
+              <div class="text-blue-200 text-sm">{{ stat.label }}</div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Hero Image -->
+        <div class="relative">
+          <div class="relative z-10 bg-white/10 backdrop-blur-lg rounded-2xl p-8 border border-white/20 shadow-2xl">
+            <img src="assets/images/hero.jpg" 
+                 alt="Shopping Experience"
+                 class="w-full h-auto rounded-lg shadow-2xl">
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Scroll Indicator -->
+    <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+      <i class="fas fa-chevron-down text-2xl text-white opacity-70"></i>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+          Why Shop With Us?
+        </h2>
+        <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+          We bring together the best vendors and products to give you an unparalleled shopping experience
+        </p>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div *ngFor="let feature of features" 
+             class="text-center p-8 rounded-2xl bg-gradient-to-br from-gray-50 to-white hover:from-white hover:to-blue-50 border border-gray-100 hover:border-blue-200 transition-all duration-300 hover:shadow-xl group">
+          <div class="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-blue-600 transition-colors duration-300">
+            <i [class]="feature.icon + ' text-2xl text-blue-600 group-hover:text-white'"></i>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-3">{{ feature.title }}</h3>
+          <p class="text-gray-600">{{ feature.description }}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Categories Section -->
+  <section class="py-20 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+          Shop By Category
+        </h2>
+        <p class="text-xl text-gray-600">Explore our wide range of product categories</p>
+      </div>
+      
+      <div *ngIf="categoriesLoading" class="text-center py-12">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
+        <p class="text-gray-600 mt-4">Loading categories...</p>
+      </div>
+      
+      <div *ngIf="!categoriesLoading" class="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div *ngFor="let category of categories" 
+             class="group relative bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:scale-105">
+          <div class="aspect-w-16 aspect-h-12 bg-gray-200 overflow-hidden">
+            <div class="w-full h-48 bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center">
+              <i class="fas fa-box text-white text-4xl opacity-80"></i>
+            </div>
+          </div>
+          <div class="p-6 text-center">
+            <h3 class="text-lg font-bold text-gray-900 mb-2">{{ category.name }}</h3>
+            <p class="text-gray-600 text-sm mb-4">{{ category.description || 'Explore amazing products' }}</p>
+            <button class="text-blue-600 hover:text-blue-700 font-semibold text-sm flex items-center justify-center mx-auto group-hover:translate-x-1 transition-transform duration-300">
+              Explore
+              <i class="fas fa-arrow-right ml-1"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="text-center mt-12">
+        <button routerLink="/products"
+                class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg">
+          View All Categories
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Trending Products -->
+  <section class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between mb-12">
+        <div>
+          <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
+            Trending Now 🔥
+          </h2>
+          <p class="text-xl text-gray-600">Most popular products this week</p>
+        </div>
+        <button routerLink="/products" 
+                class="hidden md:flex items-center text-blue-600 hover:text-blue-700 font-semibold text-lg">
+          View All
+          <i class="fas fa-arrow-right ml-2"></i>
+        </button>
+      </div>
+      
+      <div *ngIf="loading" class="text-center py-12">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
+        <p class="text-gray-600 mt-4">Loading trending products...</p>
+      </div>
+      
+      <div *ngIf="!loading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div *ngFor="let product of trendingProducts.slice(0, 4)" 
+             class="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 border border-gray-100 group">
+          <div class="relative h-48 bg-gray-100 overflow-hidden">
+            <img [src]="getPrimaryImage(product.images)" 
+                 [alt]="product.name"
+                 (error)="onImageError($event)"
+                 class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+            
+            <div *ngIf="product.discount" 
+                 class="absolute top-3 left-3 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg">
+              -{{ product.discount }}%
+            </div>
+            
+            <button class="absolute top-3 right-3 w-10 h-10 bg-white rounded-full shadow-md flex items-center justify-center hover:bg-red-50 hover:text-red-600 transition-colors opacity-0 group-hover:opacity-100">
+              <i class="far fa-heart"></i>
+            </button>
+          </div>
+          
+          <div class="p-5">
+            <div class="mb-2">
+              <span class="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded-full">
+                {{ product.vendorName }}
+              </span>
+            </div>
+            
+            <h3 class="font-bold text-gray-900 mb-2 line-clamp-2">{{ product.name }}</h3>
+            
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center space-x-2">
+                <span class="text-xl font-bold text-gray-900">
+                  ${{ calculateDiscountPrice(product.price, product.discount) }}
+                </span>
+                <span *ngIf="product.discount" class="text-sm text-gray-500 line-through">
+                  ${{ product.price }}
+                </span>
+              </div>
+            </div>
+            
+            <button [routerLink]="['/products', product.id]"
+                    class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-semibold transition-colors">
+              View Details
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="text-center mt-8 md:hidden">
+        <button routerLink="/products"
+                class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-xl font-semibold transition-colors">
+          View All Trending
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Best Sellers -->
+  <section class="py-20 bg-gradient-to-br from-gray-50 to-blue-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+          Best Sellers 🏆
+        </h2>
+        <p class="text-xl text-gray-600">Top-rated products loved by our customers</p>
+      </div>
+      
+      <div *ngIf="!loading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div *ngFor="let product of bestSellingProducts.slice(0, 4)" 
+             class="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 border border-gray-100 group">
+          <div class="relative h-48 bg-gray-100 overflow-hidden">
+            <img [src]="getPrimaryImage(product.images)" 
+                 [alt]="product.name"
+                 (error)="onImageError($event)"
+                 class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+            
+            <div class="absolute top-3 left-3 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg">
+              Best Seller
+            </div>
+          </div>
+          
+          <div class="p-5">
+            <div class="mb-2">
+              <span class="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded-full">
+                {{ product.vendorName }}
+              </span>
+            </div>
+            
+            <h3 class="font-bold text-gray-900 mb-2 line-clamp-2">{{ product.name }}</h3>
+            
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center space-x-2">
+                <span class="text-xl font-bold text-gray-900">
+                  ${{ calculateDiscountPrice(product.price, product.discount) }}
+                </span>
+                <span *ngIf="product.discount" class="text-sm text-gray-500 line-through">
+                  ${{ product.price }}
+                </span>
+              </div>
+            </div>
+            
+            <button [routerLink]="['/products', product.id]"
+                    class="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-semibold transition-colors">
+              View Details
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials -->
+  <section class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+          What Our Customers Say
+        </h2>
+        <p class="text-xl text-gray-600">Join thousands of satisfied shoppers</p>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div *ngFor="let testimonial of testimonials" 
+             class="bg-gray-50 rounded-2xl p-8 hover:shadow-lg transition-all duration-300 border border-gray-100">
+          <div class="flex items-center mb-6">
+            <div class="w-12 h-12 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white font-bold mr-4">
+              {{ testimonial.name.charAt(0) }}
+            </div>
+            <div>
+              <h4 class="font-bold text-gray-900">{{ testimonial.name }}</h4>
+              <p class="text-gray-600 text-sm">{{ testimonial.role }}</p>
+            </div>
+          </div>
+          
+          <div class="flex text-yellow-400 mb-4">
+            <i *ngFor="let star of getStarRating(testimonial.rating)" 
+               [class]="star.filled ? 'fas fa-star' : star.half ? 'fas fa-star-half-alt' : 'far fa-star'">
+            </i>
+          </div>
+          
+          <p class="text-gray-700 italic">"{{ testimonial.comment }}"</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="py-20 bg-gradient-to-r from-blue-600 to-purple-700 text-white">
+    <div class="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+      <h2 class="text-3xl md:text-4xl font-bold mb-6">
+        Ready to Start Shopping?
+      </h2>
+      <p class="text-xl text-blue-100 mb-8">
+        Join thousands of satisfied customers and discover amazing products from trusted vendors.
+      </p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <button routerLink="/products"
+                class="bg-white text-blue-600 hover:bg-gray-100 px-8 py-4 rounded-xl font-bold text-lg transition-all duration-300 transform hover:scale-105 shadow-lg">
+          <i class="fas fa-shopping-bag mr-2"></i>
+          Start Shopping
+        </button>
+        <button routerLink="/auth/register"
+                class="border-2 border-white hover:bg-white hover:text-blue-600 px-8 py-4 rounded-xl font-bold text-lg transition-all duration-300 transform hover:scale-105">
+          <i class="fas fa-user-plus mr-2"></i>
+          Create Account
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Newsletter -->
+  <section class="py-16 bg-gray-900 text-white">
+    <div class="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+      <h3 class="text-2xl md:text-3xl font-bold mb-4">Stay Updated</h3>
+      <p class="text-gray-400 mb-6">Get the latest deals and product updates delivered to your inbox</p>
+      <div class="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
+        <input type="email" 
+               placeholder="Enter your email"
+               class="flex-1 px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+        <button class="bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-lg font-semibold transition-colors whitespace-nowrap">
+          Subscribe
+        </button>
+      </div>
+    </div>
+  </section>
+</div>

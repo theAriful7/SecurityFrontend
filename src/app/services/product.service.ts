@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { environment } from '../environments/environment';
 import { ProductRequestDTO, ProductResponseDTO } from '../models/product.model';
 import { ProductStatus } from '../models/productStatus.model';
+import { FileUploadResponse } from '../models/file-data.model';
 
 export interface ProductFilter {
   categoryId?: number;
@@ -30,6 +31,13 @@ export class ProductService {
     private apiUrl = environment.apiUrl;
 
   constructor(private http: HttpClient) { }
+
+    uploadProductImage(file: File): Observable<FileUploadResponse> {
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    return this.http.post<FileUploadResponse>(`${this.apiUrl}/files/upload`, formData);
+  }
 
   // Vendor endpoints
   createProduct(vendorId: number, product: ProductRequestDTO): Observable<ProductResponseDTO> {

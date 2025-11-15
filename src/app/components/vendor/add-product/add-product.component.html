@@ -1,1 +1,489 @@
-<p>add-product works!</p>
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 py-8">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Header Section -->
+    <div class="mb-8 text-center">
+      <div class="inline-flex items-center justify-center w-16 h-16 bg-blue-600 rounded-full mb-4">
+        <i class="fas fa-plus text-white text-2xl"></i>
+      </div>
+      <h1 class="text-4xl font-bold text-gray-900 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+        Add New Product
+      </h1>
+      <p class="text-lg text-gray-600 mt-3 max-w-2xl mx-auto">
+        Add a stunning new product to your catalog and reach more customers
+      </p>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loading" class="bg-white rounded-2xl shadow-xl p-12 text-center border border-gray-100">
+      <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-6"></div>
+      <h3 class="text-xl font-semibold text-gray-900 mb-2">Setting up your workspace</h3>
+      <p class="text-gray-600">Loading vendor profile and categories...</p>
+    </div>
+
+    <!-- Main Form -->
+    <form *ngIf="!loading" [formGroup]="productForm" (ngSubmit)="onSubmit()" class="space-y-8">
+      <!-- Basic Information Card -->
+      <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+        <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4">
+          <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
+              <i class="fas fa-info-circle text-white text-lg"></i>
+            </div>
+            <div>
+              <h2 class="text-xl font-bold text-white">Basic Information</h2>
+              <p class="text-blue-100 text-sm">Tell us about your product</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="p-6">
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Product Name -->
+            <div class="lg:col-span-2">
+              <label class="block text-sm font-semibold text-gray-900 mb-3">
+                Product Name <span class="text-red-500">*</span>
+              </label>
+              <input type="text" 
+                     formControlName="name"
+                     class="w-full px-4 py-4 text-lg border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all duration-200"
+                     placeholder="Enter an attractive product name">
+              <div *ngIf="name?.touched && name?.errors" class="mt-2 space-y-1">
+                <div *ngIf="name?.errors?.['required']" class="flex items-center space-x-2 text-red-600">
+                  <i class="fas fa-exclamation-circle text-sm"></i>
+                  <span class="text-sm font-medium">Product name is required</span>
+                </div>
+                <div *ngIf="name?.errors?.['minlength']" class="flex items-center space-x-2 text-red-600">
+                  <i class="fas fa-exclamation-circle text-sm"></i>
+                  <span class="text-sm font-medium">Product name must be at least 3 characters</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Description -->
+            <div class="lg:col-span-2">
+              <label class="block text-sm font-semibold text-gray-900 mb-3">
+                Description <span class="text-red-500">*</span>
+              </label>
+              <textarea formControlName="description"
+                        rows="5"
+                        class="w-full px-4 py-4 text-lg border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all duration-200 resize-none"
+                        placeholder="Describe your product in detail..."></textarea>
+              <div *ngIf="description?.touched && description?.errors" class="mt-2 space-y-1">
+                <div *ngIf="description?.errors?.['required']" class="flex items-center space-x-2 text-red-600">
+                  <i class="fas fa-exclamation-circle text-sm"></i>
+                  <span class="text-sm font-medium">Description is required</span>
+                </div>
+                <div *ngIf="description?.errors?.['minlength']" class="flex items-center space-x-2 text-red-600">
+                  <i class="fas fa-exclamation-circle text-sm"></i>
+                  <span class="text-sm font-medium">Description must be at least 10 characters</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pricing & Inventory Card -->
+      <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+        <div class="bg-gradient-to-r from-green-600 to-green-700 px-6 py-4">
+          <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
+              <i class="fas fa-tag text-white text-lg"></i>
+            </div>
+            <div>
+              <h2 class="text-xl font-bold text-white">Pricing & Inventory</h2>
+              <p class="text-green-100 text-sm">Set your price and stock levels</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="p-6">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Price -->
+            <div>
+              <label class="block text-sm font-semibold text-gray-900 mb-3">
+                Price <span class="text-red-500">*</span>
+              </label>
+              <div class="relative">
+                <span class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 text-lg">$</span>
+                <input type="number" 
+                       formControlName="price"
+                       step="0.01"
+                       min="0"
+                       class="w-full pl-12 pr-4 py-4 text-lg border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-green-100 focus:border-green-500 transition-all duration-200"
+                       placeholder="0.00">
+              </div>
+              <div *ngIf="price?.touched && price?.errors" class="mt-2 space-y-1">
+                <div *ngIf="price?.errors?.['required']" class="flex items-center space-x-2 text-red-600">
+                  <i class="fas fa-exclamation-circle text-sm"></i>
+                  <span class="text-sm font-medium">Price is required</span>
+                </div>
+                <div *ngIf="price?.errors?.['min']" class="flex items-center space-x-2 text-red-600">
+                  <i class="fas fa-exclamation-circle text-sm"></i>
+                  <span class="text-sm font-medium">Price must be positive</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Stock -->
+            <div>
+              <label class="block text-sm font-semibold text-gray-900 mb-3">
+                Stock Quantity <span class="text-red-500">*</span>
+              </label>
+              <input type="number" 
+                     formControlName="stock"
+                     min="0"
+                     class="w-full px-4 py-4 text-lg border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-green-100 focus:border-green-500 transition-all duration-200"
+                     placeholder="Enter quantity">
+              <div *ngIf="stock?.touched && stock?.errors" class="mt-2 space-y-1">
+                <div *ngIf="stock?.errors?.['required']" class="flex items-center space-x-2 text-red-600">
+                  <i class="fas fa-exclamation-circle text-sm"></i>
+                  <span class="text-sm font-medium">Stock quantity is required</span>
+                </div>
+                <div *ngIf="stock?.errors?.['min']" class="flex items-center space-x-2 text-red-600">
+                  <i class="fas fa-exclamation-circle text-sm"></i>
+                  <span class="text-sm font-medium">Stock must be positive</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Discount -->
+            <div>
+              <label class="block text-sm font-semibold text-gray-900 mb-3">
+                Discount (%)
+              </label>
+              <div class="relative">
+                <span class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 text-lg">%</span>
+                <input type="number" 
+                       formControlName="discount"
+                       min="0"
+                       max="100"
+                       class="w-full px-4 py-4 pr-12 text-lg border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-green-100 focus:border-green-500 transition-all duration-200"
+                       placeholder="0">
+              </div>
+              <div *ngIf="discount?.touched && discount?.errors" class="mt-2 space-y-1">
+                <div *ngIf="discount?.errors?.['min']" class="flex items-center space-x-2 text-red-600">
+                  <i class="fas fa-exclamation-circle text-sm"></i>
+                  <span class="text-sm font-medium">Discount cannot be negative</span>
+                </div>
+                <div *ngIf="discount?.errors?.['max']" class="flex items-center space-x-2 text-red-600">
+                  <i class="fas fa-exclamation-circle text-sm"></i>
+                  <span class="text-sm font-medium">Discount cannot exceed 100%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Category & Brand Card -->
+      <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+        <div class="bg-gradient-to-r from-purple-600 to-purple-700 px-6 py-4">
+          <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
+              <i class="fas fa-layer-group text-white text-lg"></i>
+            </div>
+            <div>
+              <h2 class="text-xl font-bold text-white">Category & Brand</h2>
+              <p class="text-purple-100 text-sm">Organize your product</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="p-6">
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Category -->
+            <div>
+              <label class="block text-sm font-semibold text-gray-900 mb-3">
+                Category <span class="text-red-500">*</span>
+              </label>
+              <select formControlName="categoryId"
+                      (change)="onCategoryChange()"
+                      class="w-full px-4 py-4 text-lg border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-purple-100 focus:border-purple-500 transition-all duration-200 appearance-none bg-white">
+                <option value="">Select a category</option>
+                <option *ngFor="let category of categories" [value]="category.id">
+                  {{ category.name }}
+                </option>
+              </select>
+              <div *ngIf="categoryId?.touched && categoryId?.errors" class="mt-2">
+                <div class="flex items-center space-x-2 text-red-600">
+                  <i class="fas fa-exclamation-circle text-sm"></i>
+                  <span class="text-sm font-medium">Category is required</span>
+                </div>
+              </div>
+              <div *ngIf="categories.length === 0 && !loading" class="mt-2">
+                <div class="flex items-center space-x-2 text-yellow-600">
+                  <i class="fas fa-exclamation-triangle text-sm"></i>
+                  <span class="text-sm font-medium">No categories available</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Sub Category -->
+            <div>
+              <label class="block text-sm font-semibold text-gray-900 mb-3">
+                Sub Category
+              </label>
+              <select formControlName="subCategoryId"
+                      class="w-full px-4 py-4 text-lg border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-purple-100 focus:border-purple-500 transition-all duration-200 appearance-none bg-white"
+                      [disabled]="subCategories.length === 0">
+                <option value="">
+                  {{ subCategories.length > 0 ? 'Select sub category' : 'No subcategories available' }}
+                </option>
+                <option *ngFor="let subCategory of subCategories" [value]="subCategory.id">
+                  {{ subCategory.name }}
+                </option>
+              </select>
+            </div>
+
+            <!-- Brand -->
+            <div class="lg:col-span-2">
+              <label class="block text-sm font-semibold text-gray-900 mb-3">
+                Brand Name
+              </label>
+              <input type="text" 
+                     formControlName="brand"
+                     class="w-full px-4 py-4 text-lg border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-purple-100 focus:border-purple-500 transition-all duration-200"
+                     placeholder="Enter brand name (optional)">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Image Upload Card -->
+      <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+        <div class="bg-gradient-to-r from-orange-600 to-orange-700 px-6 py-4">
+          <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
+              <i class="fas fa-images text-white text-lg"></i>
+            </div>
+            <div>
+              <h2 class="text-xl font-bold text-white">Product Images</h2>
+              <p class="text-orange-100 text-sm">Showcase your product with stunning images</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="p-6">
+          <!-- File Upload Area -->
+          <div class="border-3 border-dashed border-orange-200 rounded-2xl p-8 text-center mb-6 bg-orange-50 transition-all duration-300 hover:border-orange-300 hover:bg-orange-100"
+               (drop)="onFileDrop($event)"
+               (dragover)="onDragOver($event)"
+               (dragleave)="onDragLeave($event)">
+            <input type="file" 
+                   #fileInput
+                   (change)="onFileSelected($event)"
+                   multiple
+                   accept="image/*"
+                   class="hidden">
+            
+            <div class="space-y-4">
+              <div class="w-20 h-20 bg-orange-500 rounded-2xl flex items-center justify-center mx-auto">
+                <i class="fas fa-cloud-upload-alt text-white text-3xl"></i>
+              </div>
+              <div>
+                <p class="text-gray-700 text-lg font-medium">
+                  <button type="button" 
+                          (click)="fileInput.click()"
+                          class="text-orange-600 hover:text-orange-700 font-bold underline decoration-2 decoration-orange-500">
+                    Click to upload
+                  </button>
+                  <span class="text-gray-600"> or drag and drop</span>
+                </p>
+                <p class="text-gray-500 text-sm mt-2">PNG, JPG, JPEG up to 10MB each</p>
+                <p class="text-orange-600 text-sm font-medium mt-3" *ngIf="uploadedImagesCount === 0">
+                  <i class="fas fa-exclamation-triangle mr-1"></i>
+                  At least one image is required
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Upload Progress -->
+          <div *ngIf="uploading" class="mb-6 p-6 bg-blue-50 rounded-2xl border border-blue-200">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center space-x-3">
+                <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                <div>
+                  <p class="font-semibold text-blue-900">Uploading product images...</p>
+                  <p class="text-blue-700 text-sm">({{ uploadedCompletedCount }}/{{ uploadedImagesCount }} completed)</p>
+                </div>
+              </div>
+              <span class="font-bold text-blue-900 text-lg">{{ uploadProgress }}%</span>
+            </div>
+            
+            <!-- Progress Bar -->
+            <div class="w-full bg-blue-200 rounded-full h-3">
+              <div class="bg-gradient-to-r from-blue-500 to-blue-600 h-3 rounded-full transition-all duration-500 ease-out shadow-sm"
+                   [style.width]="uploadProgress + '%'"></div>
+            </div>
+          </div>
+
+          <!-- Uploaded Images Preview -->
+          <div *ngIf="uploadedImagesCount > 0" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div *ngFor="let image of uploadedImages; let i = index" 
+                 class="relative group bg-gray-50 rounded-2xl overflow-hidden border-2 transition-all duration-300 hover:shadow-lg"
+                 [class.border-blue-500]="image.isPrimary"
+                 [class.border-gray-200]="!image.isPrimary">
+              
+              <img [src]="image.previewUrl" 
+                   [alt]="image.altText || 'Product image'"
+                   class="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105">
+              
+              <!-- Image Overlay Actions -->
+              <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-60 transition-all flex items-center justify-center space-x-2 opacity-0 group-hover:opacity-100">
+                <button type="button" 
+                        (click)="removeImage(i)"
+                        class="bg-red-500 text-white p-3 rounded-full hover:bg-red-600 transition-colors transform scale-0 group-hover:scale-100 duration-300">
+                  <i class="fas fa-trash text-sm"></i>
+                </button>
+                <button *ngIf="!image.isPrimary"
+                        type="button"
+                        (click)="setPrimaryImage(i)"
+                        class="bg-blue-500 text-white p-3 rounded-full hover:bg-blue-600 transition-colors transform scale-0 group-hover:scale-100 duration-300 delay-100">
+                  <i class="fas fa-star text-sm"></i>
+                </button>
+              </div>
+
+              <!-- Primary Badge -->
+              <div *ngIf="image.isPrimary" 
+                   class="absolute top-3 left-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg">
+                <i class="fas fa-crown mr-1"></i>
+                Primary
+              </div>
+
+              <!-- Upload Status -->
+              <div *ngIf="!image.uploaded && !uploading" 
+                   class="absolute bottom-3 left-3 bg-yellow-500 text-white px-2 py-1 rounded-full text-xs font-medium">
+                <i class="fas fa-clock mr-1"></i>
+                Pending
+              </div>
+              <div *ngIf="image.uploaded" 
+                   class="absolute bottom-3 left-3 bg-green-500 text-white px-2 py-1 rounded-full text-xs font-medium">
+                <i class="fas fa-check mr-1"></i>
+                Uploaded
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Specifications Card -->
+      <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+        <div class="bg-gradient-to-r from-indigo-600 to-indigo-700 px-6 py-4">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+              <div class="w-10 h-10 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
+                <i class="fas fa-list-alt text-white text-lg"></i>
+              </div>
+              <div>
+                <h2 class="text-xl font-bold text-white">Specifications</h2>
+                <p class="text-indigo-100 text-sm">Add product details and features</p>
+              </div>
+            </div>
+            <button type="button" 
+                    (click)="addSpecification()"
+                    class="px-6 py-3 bg-white text-indigo-600 rounded-xl font-bold hover:bg-gray-100 transition-colors shadow-lg">
+              <i class="fas fa-plus mr-2"></i>
+              Add Specification
+            </button>
+          </div>
+        </div>
+        
+        <div class="p-6">
+          <div formArrayName="specifications">
+            <!-- Specifications List -->
+            <div *ngFor="let spec of specifications.controls; let i = index" 
+                 [formGroupName]="i"
+                 class="grid grid-cols-1 md:grid-cols-12 gap-4 mb-4 p-6 bg-indigo-50 rounded-xl border border-indigo-100">
+              
+              <!-- Key -->
+              <div class="md:col-span-5">
+                <label class="block text-sm font-semibold text-gray-900 mb-2">Key</label>
+                <input type="text" 
+                       formControlName="key"
+                       class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-100 focus:border-indigo-500 transition-all"
+                       placeholder="e.g., Color, Size, Material">
+                <div *ngIf="spec.get('key')?.touched && spec.get('key')?.errors" class="mt-1">
+                  <span class="text-red-600 text-xs font-medium">Key is required</span>
+                </div>
+              </div>
+
+              <!-- Value -->
+              <div class="md:col-span-5">
+                <label class="block text-sm font-semibold text-gray-900 mb-2">Value</label>
+                <input type="text" 
+                       formControlName="value"
+                       class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-100 focus:border-indigo-500 transition-all"
+                       placeholder="e.g., Red, Large, Cotton">
+                <div *ngIf="spec.get('value')?.touched && spec.get('value')?.errors" class="mt-1">
+                  <span class="text-red-600 text-xs font-medium">Value is required</span>
+                </div>
+              </div>
+
+              <!-- Display Order -->
+              <div class="md:col-span-1">
+                <label class="block text-sm font-semibold text-gray-900 mb-2">Order</label>
+                <input type="number" 
+                       formControlName="displayOrder"
+                       class="w-full px-3 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-100 focus:border-indigo-500 transition-all"
+                       placeholder="#">
+              </div>
+
+              <!-- Remove Button -->
+              <div class="md:col-span-1 flex items-end">
+                <button type="button" 
+                        (click)="removeSpecification(i)"
+                        class="w-full px-4 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors font-medium">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Empty State -->
+          <div *ngIf="specifications.length === 0" class="text-center py-12 border-3 border-dashed border-gray-200 rounded-2xl bg-gray-50">
+            <div class="w-16 h-16 bg-gray-200 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <i class="fas fa-list-alt text-gray-400 text-2xl"></i>
+            </div>
+            <h3 class="text-lg font-semibold text-gray-700 mb-2">No specifications added yet</h3>
+            <p class="text-gray-500 max-w-md mx-auto">
+              Add product specifications like color, size, material, or any other important details that customers should know.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="bg-white rounded-2xl shadow-xl border border-gray-100 p-8">
+        <div class="flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
+          <div class="text-sm text-gray-600">
+            <p class="font-medium">Ready to launch your product?</p>
+            <p>Make sure all information is correct before submitting.</p>
+          </div>
+          
+          <div class="flex space-x-4">
+            <button type="button" 
+                    routerLink="/vendor/products"
+                    class="px-8 py-4 border-2 border-gray-300 text-gray-700 rounded-xl font-bold hover:bg-gray-50 transition-all duration-200 hover:shadow-lg">
+              <i class="fas fa-arrow-left mr-2"></i>
+              Cancel
+            </button>
+            <button type="submit" 
+                    [disabled]="submitting || uploading"
+                    class="px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-bold hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:shadow-xl transform hover:scale-105 disabled:hover:scale-100">
+              <span *ngIf="submitting">
+                <i class="fas fa-spinner fa-spin mr-2"></i>
+                Creating Product...
+              </span>
+              <span *ngIf="!submitting">
+                <i class="fas fa-rocket mr-2"></i>
+                Launch Product
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
