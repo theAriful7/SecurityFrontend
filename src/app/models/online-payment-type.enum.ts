@@ -1,0 +1,7 @@
+export enum OnlinePaymentType {
+  CREDIT_CARD = 'CREDIT_CARD',
+  DEBIT_CARD = 'DEBIT_CARD',
+  UPI = 'UPI',
+  NET_BANKING = 'NET_BANKING',
+  DIGITAL_WALLET = 'DIGITAL_WALLET'
+}

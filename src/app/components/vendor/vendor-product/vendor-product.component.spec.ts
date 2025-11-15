@@ -1,0 +1,23 @@
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { VendorProductComponent } from './vendor-product.component';
+
+describe('VendorProductComponent', () => {
+  let component: VendorProductComponent;
+  let fixture: ComponentFixture<VendorProductComponent>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      declarations: [ VendorProductComponent ]
+    })
+    .compileComponents();
+
+    fixture = TestBed.createComponent(VendorProductComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});

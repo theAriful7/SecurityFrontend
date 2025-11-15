@@ -1,0 +1,4 @@
+export enum PaymentOption {
+  FULL_PAYMENT = 'FULL_PAYMENT',
+  PARTIAL_PAYMENT = 'PARTIAL_PAYMENT'
+}
