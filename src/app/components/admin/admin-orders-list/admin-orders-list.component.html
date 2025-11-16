@@ -1,1 +1,419 @@
-<p>admin-orders-list works!</p>
+<div class="min-h-screen bg-gray-50 p-6">
+  <!-- Header -->
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold text-gray-800">Order Management</h1>
+    <p class="text-gray-600 mt-2">Manage and track all customer orders</p>
+  </div>
+
+  <!-- Filters Section -->
+  <div class="bg-white rounded-xl shadow-sm p-6 mb-6 border border-gray-100">
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
+      <!-- Search -->
+      <div class="lg:col-span-2">
+        <label class="block text-sm font-medium text-gray-700 mb-2">Search Orders</label>
+        <input
+          type="text"
+          [(ngModel)]="searchTerm"
+          (input)="applyFilters()"
+          placeholder="Search by order number or ID..."
+          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        >
+      </div>
+
+      <!-- Status Filter -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Order Status</label>
+        <select
+          [(ngModel)]="selectedStatus"
+          (change)="applyFilters()"
+          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        >
+          <option *ngFor="let status of statusOptions" [value]="status.value">
+            {{ status.label }}
+          </option>
+        </select>
+      </div>
+
+      <!-- Results Count -->
+      <div class="flex items-end">
+        <p class="text-gray-600 text-sm">
+          Showing {{ filteredOrders.length }} of {{ orders.length }} orders
+        </p>
+      </div>
+    </div>
+
+    <!-- Date Range Filter -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Start Date</label>
+        <input
+          type="date"
+          [(ngModel)]="dateRange.start"
+          (change)="applyFilters()"
+          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        >
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">End Date</label>
+        <input
+          type="date"
+          [(ngModel)]="dateRange.end"
+          (change)="applyFilters()"
+          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        >
+      </div>
+      <div class="flex items-end">
+        <button
+          (click)="dateRange = { start: '', end: '' }; applyFilters()"
+          class="px-4 py-2 text-gray-600 hover:text-gray-800 font-medium"
+        >
+          Clear Dates
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="flex justify-center items-center py-12">
+    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+  </div>
+
+  <!-- Orders Table -->
+  <div *ngIf="!isLoading" class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Order Details
+            </th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Customer
+            </th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Amount
+            </th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Date
+            </th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Status
+            </th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Actions
+            </th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <tr *ngFor="let order of filteredOrders" class="hover:bg-gray-50 transition-colors">
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div>
+                <div class="text-sm font-medium text-gray-900">
+                  #{{ order.orderNumber || order.id }}
+                </div>
+                <div class="text-sm text-gray-500">
+                  {{ order.items?.length || 0 }} items
+                </div>
+              </div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm text-gray-900">
+                User #{{ order.userId }}
+              </div>
+              <div class="text-sm text-gray-500" *ngIf="order.shippingAddress">
+                {{ order.shippingAddress.city }}, {{ order.shippingAddress.state }}
+              </div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm font-medium text-gray-900">
+                {{ order.totalAmount | currency:'USD' }}
+              </div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              {{ order.createdAt | date:'mediumDate' }}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <span [class]="getStatusBadgeClass(order.status)" 
+                    class="px-3 py-1 rounded-full text-xs font-medium">
+                {{ order.status }}
+              </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+              <div class="flex space-x-2">
+                <button
+                  (click)="viewOrderDetails(order)"
+                  class="text-blue-600 hover:text-blue-900 px-3 py-1 rounded-lg bg-blue-50 hover:bg-blue-100 transition-colors"
+                >
+                  View
+                </button>
+                
+                <!-- Status Update Buttons -->
+                <div class="flex space-x-1" *ngIf="order.status !== 'DELIVERED' && order.status !== 'CANCELLED'">
+                  <button
+                    *ngIf="order.status === 'PENDING'"
+                    (click)="updateOrderStatus(order, 'PROCESSING')"
+                    class="text-green-600 hover:text-green-900 px-2 py-1 rounded-lg bg-green-50 hover:bg-green-100 transition-colors text-xs"
+                    title="Start Processing"
+                  >
+                    Process
+                  </button>
+                  
+                  <button
+                    *ngIf="order.status === 'PROCESSING'"
+                    (click)="updateOrderStatus(order, 'READY_FOR_SHIPMENT')"
+                    class="text-purple-600 hover:text-purple-900 px-2 py-1 rounded-lg bg-purple-50 hover:bg-purple-100 transition-colors text-xs"
+                    title="Ready for Shipment"
+                  >
+                    Ship
+                  </button>
+                  
+                  <button
+                    *ngIf="order.status === 'READY_FOR_SHIPMENT'"
+                    (click)="updateOrderStatus(order, 'IN_TRANSIT')"
+                    class="text-indigo-600 hover:text-indigo-900 px-2 py-1 rounded-lg bg-indigo-50 hover:bg-indigo-100 transition-colors text-xs"
+                    title="Mark as In Transit"
+                  >
+                    Transit
+                  </button>
+                  
+                  <button
+                    *ngIf="order.status === 'IN_TRANSIT'"
+                    (click)="updateOrderStatus(order, 'OUT_FOR_DELIVERY')"
+                    class="text-pink-600 hover:text-pink-900 px-2 py-1 rounded-lg bg-pink-50 hover:bg-pink-100 transition-colors text-xs"
+                    title="Out for Delivery"
+                  >
+                    Deliver
+                  </button>
+                  
+                  <button
+                    *ngIf="order.status === 'OUT_FOR_DELIVERY'"
+                    (click)="updateOrderStatus(order, 'DELIVERED')"
+                    class="text-green-600 hover:text-green-900 px-2 py-1 rounded-lg bg-green-50 hover:bg-green-100 transition-colors text-xs"
+                    title="Mark as Delivered"
+                  >
+                    Complete
+                  </button>
+                </div>
+
+                <button
+                  *ngIf="order.status === 'PENDING' || order.status === 'PROCESSING'"
+                  (click)="updateOrderStatus(order, 'CANCELLED')"
+                  class="text-red-600 hover:text-red-900 px-2 py-1 rounded-lg bg-red-50 hover:bg-red-100 transition-colors text-xs"
+                  title="Cancel Order"
+                >
+                  Cancel
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="filteredOrders.length === 0 && !isLoading" class="text-center py-12">
+      <i class="fas fa-shopping-cart text-4xl text-gray-300 mb-4"></i>
+      <p class="text-gray-500 text-lg">No orders found</p>
+      <p class="text-gray-400 mt-2">Try adjusting your search criteria or date range</p>
+    </div>
+  </div>
+</div>
+
+<!-- Order Details Modal -->
+<div *ngIf="showOrderModal && selectedOrder" 
+     class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+  <div class="bg-white rounded-xl shadow-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+    <div class="p-6 border-b border-gray-200">
+      <div class="flex justify-between items-center">
+        <h3 class="text-lg font-semibold text-gray-800">
+          Order Details - #{{ selectedOrder.orderNumber || selectedOrder.id }}
+        </h3>
+        <button
+          (click)="showOrderModal = false; selectedOrder = null;"
+          class="text-gray-400 hover:text-gray-600"
+        >
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    </div>
+    
+    <div class="p-6 space-y-6">
+      <!-- Order Summary -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-gray-50 rounded-lg p-4">
+          <h4 class="text-sm font-medium text-gray-500 mb-2">ORDER INFORMATION</h4>
+          <div class="space-y-1 text-sm">
+            <div class="flex justify-between">
+              <span class="text-gray-600">Order ID:</span>
+              <span class="font-medium">{{ selectedOrder.id }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-600">Order Date:</span>
+              <span class="font-medium">{{ selectedOrder.createdAt | date:'medium' }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-600">Status:</span>
+              <span [class]="getStatusBadgeClass(selectedOrder.status)" 
+                    class="px-2 py-1 rounded-full text-xs font-medium">
+                {{ selectedOrder.status }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-gray-50 rounded-lg p-4">
+          <h4 class="text-sm font-medium text-gray-500 mb-2">CUSTOMER INFORMATION</h4>
+          <div class="space-y-1 text-sm">
+            <div class="flex justify-between">
+              <span class="text-gray-600">Customer ID:</span>
+              <span class="font-medium">{{ selectedOrder.userId }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-gray-50 rounded-lg p-4">
+          <h4 class="text-sm font-medium text-gray-500 mb-2">PAYMENT INFORMATION</h4>
+          <div class="space-y-1 text-sm">
+            <div class="flex justify-between">
+              <span class="text-gray-600">Total Amount:</span>
+              <span class="font-medium text-green-600">{{ selectedOrder.totalAmount | currency:'USD' }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Shipping Address -->
+      <div *ngIf="selectedOrder.shippingAddress" class="bg-gray-50 rounded-lg p-4">
+        <h4 class="text-sm font-medium text-gray-500 mb-3">SHIPPING ADDRESS</h4>
+        <div class="text-sm">
+          <p class="font-medium">{{ selectedOrder.shippingAddress.recipientName }}</p>
+          <p class="text-gray-600">{{ selectedOrder.shippingAddress.street }}</p>
+          <p class="text-gray-600">
+            {{ selectedOrder.shippingAddress.city }}, {{ selectedOrder.shippingAddress.state }} {{ selectedOrder.shippingAddress.postalCode }}
+          </p>
+          <p class="text-gray-600">{{ selectedOrder.shippingAddress.country }}</p>
+          <p class="text-gray-600" *ngIf="selectedOrder.shippingAddress.phone">
+            📞 {{ selectedOrder.shippingAddress.phone }}
+          </p>
+        </div>
+      </div>
+
+      <!-- Order Items -->
+      <div>
+        <h4 class="text-sm font-medium text-gray-500 mb-3">ORDER ITEMS</h4>
+        <div class="border border-gray-200 rounded-lg overflow-hidden">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Product
+                </th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Price
+                </th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Quantity
+                </th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Total
+                </th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              <tr *ngFor="let item of selectedOrder.items" class="hover:bg-gray-50">
+                <td class="px-4 py-3 whitespace-nowrap">
+                  <div class="flex items-center">
+                    <div class="flex-shrink-0 h-10 w-10 bg-gray-200 rounded-lg flex items-center justify-center">
+                      <i class="fas fa-box text-gray-400"></i>
+                    </div>
+                    <div class="ml-3">
+                      <div class="text-sm font-medium text-gray-900">
+                        {{ item.productName }}
+                      </div>
+                      <div class="text-xs text-gray-500">
+                        Product ID: {{ item.productId }}
+                      </div>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                  {{ item.price | currency:'USD' }}
+                </td>
+                <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                  {{ item.quantity }}
+                </td>
+                <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
+                  {{ item.totalPrice | currency:'USD' }}
+                </td>
+              </tr>
+            </tbody>
+            <tfoot class="bg-gray-50">
+              <tr>
+                <td colspan="3" class="px-4 py-3 text-right text-sm font-medium text-gray-900">
+                  Total Amount:
+                </td>
+                <td class="px-4 py-3 text-sm font-bold text-green-600">
+                  {{ selectedOrder.totalAmount | currency:'USD' }}
+                </td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="p-6 border-t border-gray-200 bg-gray-50 rounded-b-xl">
+      <div class="flex justify-between items-center">
+        <!-- Status Update Options -->
+        <div class="flex space-x-2" *ngIf="selectedOrder.status !== 'DELIVERED' && selectedOrder.status !== 'CANCELLED'">
+          <button
+            *ngIf="selectedOrder.status === 'PENDING'"
+            (click)="updateOrderStatus(selectedOrder, 'PROCESSING'); showOrderModal = false"
+            class="bg-green-600 text-white hover:bg-green-700 px-4 py-2 rounded-lg font-medium transition-colors"
+          >
+            Start Processing
+          </button>
+          
+          <button
+            *ngIf="selectedOrder.status === 'PROCESSING'"
+            (click)="updateOrderStatus(selectedOrder, 'READY_FOR_SHIPMENT'); showOrderModal = false"
+            class="bg-purple-600 text-white hover:bg-purple-700 px-4 py-2 rounded-lg font-medium transition-colors"
+          >
+            Ready for Shipment
+          </button>
+          
+          <button
+            *ngIf="selectedOrder.status === 'READY_FOR_SHIPMENT'"
+            (click)="updateOrderStatus(selectedOrder, 'IN_TRANSIT'); showOrderModal = false"
+            class="bg-indigo-600 text-white hover:bg-indigo-700 px-4 py-2 rounded-lg font-medium transition-colors"
+          >
+            Mark as In Transit
+          </button>
+          
+          <button
+            *ngIf="selectedOrder.status === 'IN_TRANSIT'"
+            (click)="updateOrderStatus(selectedOrder, 'OUT_FOR_DELIVERY'); showOrderModal = false"
+            class="bg-pink-600 text-white hover:bg-pink-700 px-4 py-2 rounded-lg font-medium transition-colors"
+          >
+            Out for Delivery
+          </button>
+          
+          <button
+            *ngIf="selectedOrder.status === 'OUT_FOR_DELIVERY'"
+            (click)="updateOrderStatus(selectedOrder, 'DELIVERED'); showOrderModal = false"
+            class="bg-green-600 text-white hover:bg-green-700 px-4 py-2 rounded-lg font-medium transition-colors"
+          >
+            Mark as Delivered
+          </button>
+        </div>
+
+        <button
+          (click)="showOrderModal = false; selectedOrder = null;"
+          class="px-4 py-2 text-gray-600 hover:text-gray-800 font-medium"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

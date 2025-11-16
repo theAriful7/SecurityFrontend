@@ -1,0 +1,183 @@
+<div class="min-h-screen bg-gray-50 p-6">
+  <!-- Header -->
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold text-gray-800">Product Management</h1>
+    <p class="text-gray-600 mt-2">Manage all products across vendors</p>
+  </div>
+
+  <!-- Filters -->
+  <div class="bg-white rounded-xl shadow-sm p-6 mb-6 border border-gray-100">
+    <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+      <!-- Search -->
+      <div class="md:col-span-2">
+        <input
+          type="text"
+          [(ngModel)]="searchTerm"
+          (input)="onSearchChange()"
+          placeholder="Search products..."
+          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        >
+      </div>
+
+      <!-- Category Filter -->
+      <div>
+        <select
+          [(ngModel)]="selectedCategory"
+          (change)="onFilterChange()"
+          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        >
+          <option value="ALL">All Categories</option>
+          <option *ngFor="let category of categories" [value]="category.name">
+            {{ category.name }}
+          </option>
+        </select>
+      </div>
+
+      <!-- Vendor Filter -->
+      <div>
+        <select
+          [(ngModel)]="selectedVendor"
+          (change)="onFilterChange()"
+          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        >
+          <option value="ALL">All Vendors</option>
+          <option *ngFor="let vendor of vendors" [value]="vendor.id">
+            {{ vendor.shopName }}
+          </option>
+        </select>
+      </div>
+
+      <!-- Status Filter -->
+      <div>
+        <select
+          [(ngModel)]="selectedStatus"
+          (change)="onFilterChange()"
+          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        >
+          <option *ngFor="let status of statusOptions" [value]="status.value">
+            {{ status.label }}
+          </option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Products Table -->
+  <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Product
+            </th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Vendor
+            </th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Category
+            </th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Price
+            </th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Stock
+            </th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Status
+            </th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Actions
+            </th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <tr *ngFor="let product of filteredProducts" class="hover:bg-gray-50">
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="flex items-center">
+                <div class="flex-shrink-0 h-10 w-10 bg-gray-200 rounded-lg flex items-center justify-center">
+                  <i class="fas fa-box text-gray-400"></i>
+                </div>
+                <div class="ml-4">
+                  <div class="text-sm font-medium text-gray-900">
+                    {{ product.name }}
+                  </div>
+                  <div class="text-sm text-gray-500 truncate max-w-xs">
+                    {{ product.description }}
+                  </div>
+                </div>
+              </div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              {{ product.vendorName }}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              {{ product.categoryName }}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+              {{ product.price | currency }}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <span [class]="getStockBadgeClass(product.stock)" 
+                    class="px-2 py-1 rounded-full text-xs font-medium">
+                {{ product.stock }}
+              </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <span [class]="getStatusBadgeClass(product.status)" 
+                    class="px-2 py-1 rounded-full text-xs font-medium">
+                {{ product.status }}
+              </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
+              <button
+                (click)="viewProductDetails(product)"
+                class="text-blue-600 hover:text-blue-900"
+              >
+                View
+              </button>
+              <button
+                *ngIf="product.status === 'PENDING'"
+                (click)="updateProductStatus(product, 'ACTIVE')"
+                class="text-green-600 hover:text-green-900"
+              >
+                Approve
+              </button>
+              <button
+                *ngIf="product.status === 'PENDING'"
+                (click)="updateProductStatus(product, 'REJECTED')"
+                class="text-red-600 hover:text-red-900"
+              >
+                Reject
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="filteredProducts.length === 0" class="text-center py-12">
+      <i class="fas fa-box text-4xl text-gray-300 mb-4"></i>
+      <p class="text-gray-500 text-lg">No products found</p>
+    </div>
+  </div>
+</div>
+
+<!-- Product Details Modal -->
+<div *ngIf="showProductModal && selectedProduct" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+  <div class="bg-white rounded-xl shadow-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+    <div class="p-6 border-b border-gray-200">
+      <div class="flex justify-between items-center">
+        <h3 class="text-lg font-semibold text-gray-800">Product Details</h3>
+        <button (click)="closeProductModal()" class="text-gray-400 hover:text-gray-600">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    </div>
+    
+    <div class="p-6">
+      <!-- Product details content here -->
+    </div>
+  </div>
+</div>

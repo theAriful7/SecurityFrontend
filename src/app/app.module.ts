@@ -29,6 +29,8 @@ import { UserManagementComponentComponent } from './components/admin/user-manage
 import { HomeComponent } from './components/home/home.component';
 import { VendorProfileComponent } from './components/vendor/vendor-profile/vendor-profile.component';
 import { VendorProductsComponent } from './components/vendor/vendor-products/vendor-products.component';
+import { AdminProductsComponent } from './components/admin/admin-products/admin-products.component';
+import { AdminLayoutComponent } from './components/admin/admin-layout/admin-layout.component';
 
 
 @NgModule({
@@ -58,6 +60,8 @@ import { VendorProductsComponent } from './components/vendor/vendor-products/ven
     HomeComponent,
     VendorProfileComponent,
     VendorProductsComponent,
+    AdminProductsComponent,
+    AdminLayoutComponent,
 
     
   ],

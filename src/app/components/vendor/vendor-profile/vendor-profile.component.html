@@ -1,1 +1,467 @@
-<p>vendor-profile works!</p>
+<div class="min-h-screen bg-gray-50 py-8">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Header -->
+    <div class="mb-8">
+      <div class="flex justify-between items-start">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-900">Vendor Dashboard</h1>
+          <p class="text-gray-600 mt-2">Manage your store, products, and orders</p>
+        </div>
+        <div class="flex space-x-3">
+          <button
+            (click)="addNewProduct()"
+            class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium"
+          >
+            <i class="fas fa-plus mr-2"></i>
+            Add Product
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loading" class="flex justify-center items-center py-12">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+    </div>
+
+    <!-- Main Content -->
+    <div *ngIf="!loading && currentVendor" class="space-y-6">
+      <!-- Stats Overview -->
+      <div *ngIf="activeTab === 'dashboard'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- Total Products -->
+        <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+          <div class="flex items-center">
+            <div class="p-3 bg-blue-50 rounded-lg">
+              <i class="fas fa-box text-blue-600 text-xl"></i>
+            </div>
+            <div class="ml-4">
+              <h3 class="text-sm font-medium text-gray-500">Total Products</h3>
+              <p class="text-2xl font-bold text-gray-800">{{ stats.totalProducts }}</p>
+              <p class="text-xs text-green-600 mt-1">{{ stats.activeProducts }} active</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Total Orders -->
+        <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+          <div class="flex items-center">
+            <div class="p-3 bg-green-50 rounded-lg">
+              <i class="fas fa-shopping-cart text-green-600 text-xl"></i>
+            </div>
+            <div class="ml-4">
+              <h3 class="text-sm font-medium text-gray-500">Total Orders</h3>
+              <p class="text-2xl font-bold text-gray-800">{{ stats.totalOrders }}</p>
+              <p class="text-xs text-yellow-600 mt-1">{{ stats.pendingOrders }} pending</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Revenue -->
+        <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+          <div class="flex items-center">
+            <div class="p-3 bg-purple-50 rounded-lg">
+              <i class="fas fa-dollar-sign text-purple-600 text-xl"></i>
+            </div>
+            <div class="ml-4">
+              <h3 class="text-sm font-medium text-gray-500">Total Revenue</h3>
+              <p class="text-2xl font-bold text-gray-800">{{ stats.totalRevenue | currency:'USD' }}</p>
+              <p class="text-xs text-green-600 mt-1">{{ stats.completedOrders }} completed</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Rating -->
+        <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+          <div class="flex items-center">
+            <div class="p-3 bg-yellow-50 rounded-lg">
+              <i class="fas fa-star text-yellow-600 text-xl"></i>
+            </div>
+            <div class="ml-4">
+              <h3 class="text-sm font-medium text-gray-500">Average Rating</h3>
+              <p class="text-2xl font-bold text-gray-800">{{ stats.averageRating }}/5</p>
+              <div class="flex items-center mt-1">
+                <i class="fas fa-star text-yellow-400 text-xs"></i>
+                <i class="fas fa-star text-yellow-400 text-xs"></i>
+                <i class="fas fa-star text-yellow-400 text-xs"></i>
+                <i class="fas fa-star text-yellow-400 text-xs"></i>
+                <i class="fas fa-star-half-alt text-yellow-400 text-xs"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <div class="bg-white rounded-xl shadow-sm border border-gray-100">
+        <div class="border-b border-gray-200">
+          <nav class="flex space-x-8 px-6">
+            <button
+              (click)="setActiveTab('dashboard')"
+              [class]="activeTab === 'dashboard' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'"
+              class="py-4 px-1 border-b-2 font-medium text-sm transition-colors"
+            >
+              <i class="fas fa-tachometer-alt mr-2"></i>
+              Dashboard
+            </button>
+            <button
+              (click)="setActiveTab('profile')"
+              [class]="activeTab === 'profile' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'"
+              class="py-4 px-1 border-b-2 font-medium text-sm transition-colors"
+            >
+              <i class="fas fa-store mr-2"></i>
+              Store Profile
+            </button>
+            <button
+              (click)="setActiveTab('products')"
+              [class]="activeTab === 'products' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'"
+              class="py-4 px-1 border-b-2 font-medium text-sm transition-colors"
+            >
+              <i class="fas fa-box mr-2"></i>
+              Products
+            </button>
+            <button
+              (click)="setActiveTab('orders')"
+              [class]="activeTab === 'orders' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'"
+              class="py-4 px-1 border-b-2 font-medium text-sm transition-colors"
+            >
+              <i class="fas fa-shopping-cart mr-2"></i>
+              Orders
+            </button>
+          </nav>
+        </div>
+
+        <!-- Tab Content -->
+        <div class="p-6">
+          <!-- Dashboard Tab -->
+          <div *ngIf="activeTab === 'dashboard'" class="space-y-6">
+            <!-- Sales Chart and Recent Activity -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <!-- Sales Chart -->
+              <div class="lg:col-span-2 bg-white rounded-lg p-6 border border-gray-200">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Sales Overview</h3>
+                <div class="h-64">
+                  <!-- Chart would be implemented with Chart.js or similar -->
+                  <div class="flex items-center justify-center h-full bg-gray-50 rounded-lg">
+                    <p class="text-gray-500">Sales chart visualization</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Recent Activity -->
+              <div class="bg-white rounded-lg p-6 border border-gray-200">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
+                <div class="space-y-4">
+                  <div *ngFor="let activity of recentActivities" class="flex items-start space-x-3">
+                    <div [class]="'p-2 rounded-lg ' + getActivityColor(activity.type)">
+                      <i [class]="getActivityIcon(activity.type)" class="text-sm"></i>
+                    </div>
+                    <div class="flex-1">
+                      <p class="text-sm font-medium text-gray-900">{{ activity.message }}</p>
+                      <p class="text-xs text-gray-500 mt-1">{{ activity.time }}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div class="bg-blue-50 rounded-lg p-6 border border-blue-200">
+                <div class="flex items-center space-x-3">
+                  <i class="fas fa-box text-blue-600 text-xl"></i>
+                  <div>
+                    <h3 class="font-semibold text-blue-900">Manage Products</h3>
+                    <p class="text-blue-700 text-sm mt-1">Add, edit, or remove products</p>
+                  </div>
+                </div>
+                <button
+                  (click)="viewAllProducts()"
+                  class="w-full mt-4 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                >
+                  View Products
+                </button>
+              </div>
+
+              <div class="bg-green-50 rounded-lg p-6 border border-green-200">
+                <div class="flex items-center space-x-3">
+                  <i class="fas fa-shopping-cart text-green-600 text-xl"></i>
+                  <div>
+                    <h3 class="font-semibold text-green-900">Order Management</h3>
+                    <p class="text-green-700 text-sm mt-1">Process and track orders</p>
+                  </div>
+                </div>
+                <button
+                  (click)="viewAllOrders()"
+                  class="w-full mt-4 bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors font-medium"
+                >
+                  View Orders
+                </button>
+              </div>
+
+              <div class="bg-purple-50 rounded-lg p-6 border border-purple-200">
+                <div class="flex items-center space-x-3">
+                  <i class="fas fa-chart-bar text-purple-600 text-xl"></i>
+                  <div>
+                    <h3 class="font-semibold text-purple-900">Analytics</h3>
+                    <p class="text-purple-700 text-sm mt-1">View sales reports and insights</p>
+                  </div>
+                </div>
+                <button
+                  class="w-full mt-4 bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 transition-colors font-medium"
+                >
+                  View Analytics
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Profile Tab -->
+          <div *ngIf="activeTab === 'profile'" class="max-w-4xl">
+            <form [formGroup]="vendorForm" class="space-y-6">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Shop Name -->
+                <div class="md:col-span-2">
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Shop Name *</label>
+                  <input
+                    type="text"
+                    formControlName="shopName"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    [class.border-red-300]="isFieldInvalid('shopName')"
+                  >
+                  <div *ngIf="isFieldInvalid('shopName')" class="text-red-600 text-sm mt-1">
+                    Shop name is required and must be at least 3 characters
+                  </div>
+                </div>
+
+                <!-- Business Description -->
+                <div class="md:col-span-2">
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Business Description *</label>
+                  <textarea
+                    formControlName="businessDescription"
+                    rows="4"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    [class.border-red-300]="isFieldInvalid('businessDescription')"
+                  ></textarea>
+                  <div *ngIf="isFieldInvalid('businessDescription')" class="text-red-600 text-sm mt-1">
+                    Business description is required and must be at least 10 characters
+                  </div>
+                </div>
+
+                <!-- Tax Number -->
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Tax Number *</label>
+                  <input
+                    type="text"
+                    formControlName="taxNumber"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    [class.border-red-300]="isFieldInvalid('taxNumber')"
+                  >
+                  <div *ngIf="isFieldInvalid('taxNumber')" class="text-red-600 text-sm mt-1">
+                    Tax number is required
+                  </div>
+                </div>
+
+                <!-- Contact Phone -->
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Contact Phone *</label>
+                  <input
+                    type="tel"
+                    formControlName="contactPhone"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    [class.border-red-300]="isFieldInvalid('contactPhone')"
+                  >
+                  <div *ngIf="isFieldInvalid('contactPhone')" class="text-red-600 text-sm mt-1">
+                    Contact phone is required
+                  </div>
+                </div>
+
+                <!-- Address -->
+                <div class="md:col-span-2">
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Business Address *</label>
+                  <input
+                    type="text"
+                    formControlName="address"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    [class.border-red-300]="isFieldInvalid('address')"
+                  >
+                  <div *ngIf="isFieldInvalid('address')" class="text-red-600 text-sm mt-1">
+                    Business address is required
+                  </div>
+                </div>
+
+                <!-- Contact Email -->
+                <div class="md:col-span-2">
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Contact Email *</label>
+                  <input
+                    type="email"
+                    formControlName="contactEmail"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    [class.border-red-300]="isFieldInvalid('contactEmail')"
+                  >
+                  <div *ngIf="isFieldInvalid('contactEmail')" class="text-red-600 text-sm mt-1">
+                    Valid email is required
+                  </div>
+                </div>
+
+                <!-- Website -->
+                <div class="md:col-span-2">
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Website (Optional)</label>
+                  <input
+                    type="url"
+                    formControlName="website"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="https://example.com"
+                  >
+                </div>
+              </div>
+
+              <!-- Business Hours -->
+              <div class="border-t border-gray-200 pt-6">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">Business Hours</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4" formGroupName="businessHours">
+                  <div *ngFor="let day of ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']"
+                       class="flex justify-between items-center">
+                    <label class="text-sm font-medium text-gray-700 capitalize">{{ day }}</label>
+                    <input
+                      [formControlName]="day"
+                      type="text"
+                      class="w-48 px-3 py-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                    >
+                  </div>
+                </div>
+              </div>
+
+              <!-- Save Button -->
+              <div class="flex justify-end pt-6 border-t border-gray-200">
+                <button
+                  type="button"
+                  (click)="updateVendorProfile()"
+                  [disabled]="savingProfile || vendorForm.invalid"
+                  class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium disabled:opacity-50"
+                >
+                  <span *ngIf="!savingProfile">Save Changes</span>
+                  <span *ngIf="savingProfile" class="flex items-center">
+                    <i class="fas fa-spinner fa-spin mr-2"></i>
+                    Saving...
+                  </span>
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Products Tab -->
+          <div *ngIf="activeTab === 'products'">
+            <div class="flex justify-between items-center mb-6">
+              <h3 class="text-lg font-semibold text-gray-900">Your Products</h3>
+              <button
+                (click)="addNewProduct()"
+                class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium"
+              >
+                <i class="fas fa-plus mr-2"></i>
+                Add New Product
+              </button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div *ngFor="let product of vendorProducts" 
+                   class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow">
+                <div class="h-48 bg-gray-200 overflow-hidden">
+                  <img
+                    [src]="getPrimaryImage(product.images) || 'assets/images/placeholder.jpg'"
+                    [alt]="product.name"
+                    class="w-full h-full object-cover"
+                  >
+                </div>
+                <div class="p-4">
+                  <div class="flex justify-between items-start mb-2">
+                    <h4 class="font-semibold text-gray-900 truncate">{{ product.name }}</h4>
+                    <span [class]="getProductStatusBadge(product.status)" 
+                          class="px-2 py-1 rounded-full text-xs font-medium">
+                      {{ product.status }}
+                    </span>
+                  </div>
+                  <p class="text-gray-600 text-sm mb-3 line-clamp-2">{{ product.description }}</p>
+                  <div class="flex justify-between items-center">
+                    <span class="text-lg font-bold text-gray-900">{{ product.price | currency:'USD' }}</span>
+                    <span class="text-sm text-gray-500">Stock: {{ product.stock }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Empty State -->
+            <div *ngIf="vendorProducts.length === 0" class="text-center py-12">
+              <i class="fas fa-box text-4xl text-gray-300 mb-4"></i>
+              <h3 class="text-lg font-semibold text-gray-900 mb-2">No products yet</h3>
+              <p class="text-gray-600 mb-6">Start by adding your first product to your store</p>
+              <button
+                (click)="addNewProduct()"
+                class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium"
+              >
+                Add Your First Product
+              </button>
+            </div>
+          </div>
+
+          <!-- Orders Tab -->
+          <div *ngIf="activeTab === 'orders'">
+            <h3 class="text-lg font-semibold text-gray-900 mb-6">Recent Orders</h3>
+            
+            <div class="overflow-x-auto">
+              <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                  <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Order
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Date
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Customer
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Amount
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Status
+                    </th>
+                  </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                  <tr *ngFor="let order of vendorOrders" class="hover:bg-gray-50">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      #{{ order.orderNumber || order.id }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {{ order.createdAt | date:'short' }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      User #{{ order.userId }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      {{ order.totalAmount | currency:'USD' }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <span [class]="getOrderStatusBadge(order.status)" 
+                            class="px-3 py-1 rounded-full text-xs font-medium">
+                        {{ order.status }}
+                      </span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Empty State -->
+            <div *ngIf="vendorOrders.length === 0" class="text-center py-12">
+              <i class="fas fa-shopping-cart text-4xl text-gray-300 mb-4"></i>
+              <h3 class="text-lg font-semibold text-gray-900 mb-2">No orders yet</h3>
+              <p class="text-gray-600">Orders will appear here when customers purchase your products</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,1 +1,372 @@
 <p>checkout works!</p>
+<div class="min-h-screen bg-gray-50 py-8">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Header -->
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-gray-900">Checkout</h1>
+      <p class="text-gray-600 mt-2">Complete your purchase</p>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loading" class="flex justify-center items-center py-12">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+    </div>
+
+    <!-- Checkout Form -->
+    <div *ngIf="!loading && cartItems.length > 0" class="lg:grid lg:grid-cols-12 lg:gap-x-12">
+      <!-- Left Column - Forms -->
+      <div class="lg:col-span-7 space-y-8">
+        <!-- Shipping Address -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+          <div class="px-6 py-4 border-b border-gray-200">
+            <h2 class="text-lg font-semibold text-gray-900">Shipping Address</h2>
+          </div>
+
+          <div class="p-6">
+            <!-- Address Selection -->
+            <div *ngIf="addresses.length > 0" class="mb-6">
+              <div class="flex items-center space-x-4 mb-4">
+                <button
+                  (click)="useExistingAddress = true; showAddressForm = false"
+                  [class]="useExistingAddress ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700'"
+                  class="px-4 py-2 rounded-lg font-medium transition-colors"
+                >
+                  Use Existing Address
+                </button>
+                <button
+                  (click)="toggleAddressForm()"
+                  [class]="!useExistingAddress ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700'"
+                  class="px-4 py-2 rounded-lg font-medium transition-colors"
+                >
+                  Add New Address
+                </button>
+              </div>
+
+              <!-- Existing Addresses -->
+              <div *ngIf="useExistingAddress" class="space-y-3">
+                <div *ngFor="let address of addresses" 
+                     (click)="selectAddress(address)"
+                     class="border border-gray-300 rounded-lg p-4 cursor-pointer hover:border-blue-500 transition-colors">
+                  <div class="flex items-start justify-between">
+                    <div>
+                      <p class="font-medium text-gray-900">{{ address.recipientName }}</p>
+                      <p class="text-gray-600 text-sm mt-1">{{ address.street }}</p>
+                      <p class="text-gray-600 text-sm">
+                        {{ address.city }}, {{ address.state }} {{ address.postalCode }}
+                      </p>
+                      <p class="text-gray-600 text-sm">{{ address.country }}</p>
+                      <p class="text-gray-600 text-sm mt-1">{{ address.phone }}</p>
+                    </div>
+                    <i class="fas fa-check text-blue-600 mt-1" *ngIf="checkoutForm.get('recipientName')?.value === address.recipientName"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Address Form -->
+            <div *ngIf="showAddressForm" class="space-y-4">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="md:col-span-2">
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                  <input
+                    type="text"
+                    formControlName="recipientName"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    [class.border-red-300]="isFieldInvalid('recipientName')"
+                  >
+                  <div *ngIf="isFieldInvalid('recipientName')" class="text-red-600 text-sm mt-1">
+                    Full name is required
+                  </div>
+                </div>
+
+                <div class="md:col-span-2">
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Street Address</label>
+                  <input
+                    type="text"
+                    formControlName="street"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    [class.border-red-300]="isFieldInvalid('street')"
+                  >
+                  <div *ngIf="isFieldInvalid('street')" class="text-red-600 text-sm mt-1">
+                    Street address is required
+                  </div>
+                </div>
+
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">City</label>
+                  <input
+                    type="text"
+                    formControlName="city"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    [class.border-red-300]="isFieldInvalid('city')"
+                  >
+                  <div *ngIf="isFieldInvalid('city')" class="text-red-600 text-sm mt-1">
+                    City is required
+                  </div>
+                </div>
+
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">State</label>
+                  <input
+                    type="text"
+                    formControlName="state"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    [class.border-red-300]="isFieldInvalid('state')"
+                  >
+                  <div *ngIf="isFieldInvalid('state')" class="text-red-600 text-sm mt-1">
+                    State is required
+                  </div>
+                </div>
+
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Postal Code</label>
+                  <input
+                    type="text"
+                    formControlName="postalCode"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    [class.border-red-300]="isFieldInvalid('postalCode')"
+                  >
+                  <div *ngIf="isFieldInvalid('postalCode')" class="text-red-600 text-sm mt-1">
+                    Valid postal code is required
+                  </div>
+                </div>
+
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Country</label>
+                  <input
+                    type="text"
+                    formControlName="country"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    [class.border-red-300]="isFieldInvalid('country')"
+                  >
+                  <div *ngIf="isFieldInvalid('country')" class="text-red-600 text-sm mt-1">
+                    Country is required
+                  </div>
+                </div>
+
+                <div class="md:col-span-2">
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+                  <input
+                    type="tel"
+                    formControlName="phone"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    [class.border-red-300]="isFieldInvalid('phone')"
+                  >
+                  <div *ngIf="isFieldInvalid('phone')" class="text-red-600 text-sm mt-1">
+                    Phone number is required
+                  </div>
+                </div>
+              </div>
+
+              <button
+                (click)="addNewAddress()"
+                class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                [disabled]="checkoutForm.get('recipientName')?.invalid || checkoutForm.get('street')?.invalid"
+              >
+                Save Address
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Payment Method -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+          <div class="px-6 py-4 border-b border-gray-200">
+            <h2 class="text-lg font-semibold text-gray-900">Payment Method</h2>
+          </div>
+
+          <div class="p-6">
+            <!-- Payment Method Selection -->
+            <div class="grid grid-cols-2 gap-4 mb-6">
+              <div *ngFor="let method of paymentMethods" 
+                   (click)="selectedPaymentMethod = method.value"
+                   [class]="selectedPaymentMethod === method.value ? 'border-blue-500 bg-blue-50' : 'border-gray-300'"
+                   class="border-2 rounded-lg p-4 cursor-pointer transition-colors">
+                <div class="flex items-center space-x-3">
+                  <i [class]="method.icon" class="text-lg text-gray-700"></i>
+                  <span class="font-medium text-gray-900">{{ method.label }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Credit Card Form -->
+            <div *ngIf="selectedPaymentMethod === 'CREDIT_CARD' || selectedPaymentMethod === 'DEBIT_CARD'" class="space-y-4">
+              <!-- Card Options -->
+              <div class="flex space-x-4 mb-4">
+                <div *ngFor="let option of paymentOptions" 
+                     (click)="selectedPaymentOption = option.value"
+                     [class]="selectedPaymentOption === option.value ? 'border-blue-500 bg-blue-50' : 'border-gray-300'"
+                     class="border rounded-lg p-3 cursor-pointer transition-colors">
+                  <i [class]="option.icon" class="text-2xl text-gray-700"></i>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="md:col-span-2">
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Card Number</label>
+                  <input
+                    type="text"
+                    formControlName="cardNumber"
+                    placeholder="1234 5678 9012 3456"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    [class.border-red-300]="isFieldInvalid('cardNumber')"
+                  >
+                  <div *ngIf="isFieldInvalid('cardNumber')" class="text-red-600 text-sm mt-1">
+                    Valid card number is required
+                  </div>
+                </div>
+
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Expiry Date</label>
+                  <input
+                    type="text"
+                    formControlName="expiryDate"
+                    placeholder="MM/YY"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    [class.border-red-300]="isFieldInvalid('expiryDate')"
+                  >
+                  <div *ngIf="isFieldInvalid('expiryDate')" class="text-red-600 text-sm mt-1">
+                    Valid expiry date is required
+                  </div>
+                </div>
+
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">CVV</label>
+                  <input
+                    type="text"
+                    formControlName="cvv"
+                    placeholder="123"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    [class.border-red-300]="isFieldInvalid('cvv')"
+                  >
+                  <div *ngIf="isFieldInvalid('cvv')" class="text-red-600 text-sm mt-1">
+                    CVV is required
+                  </div>
+                </div>
+
+                <div class="md:col-span-2">
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Cardholder Name</label>
+                  <input
+                    type="text"
+                    formControlName="cardholderName"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    [class.border-red-300]="isFieldInvalid('cardholderName')"
+                  >
+                  <div *ngIf="isFieldInvalid('cardholderName')" class="text-red-600 text-sm mt-1">
+                    Cardholder name is required
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- PayPal Info -->
+            <div *ngIf="selectedPaymentMethod === 'PAYPAL'" class="text-center py-8">
+              <i class="fab fa-paypal text-4xl text-blue-600 mb-4"></i>
+              <p class="text-gray-600">You will be redirected to PayPal to complete your payment</p>
+            </div>
+
+            <!-- COD Info -->
+            <div *ngIf="selectedPaymentMethod === 'COD'" class="text-center py-8">
+              <i class="fas fa-money-bill-wave text-4xl text-green-600 mb-4"></i>
+              <p class="text-gray-600">Pay with cash when your order is delivered</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Order Notes -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+          <div class="px-6 py-4 border-b border-gray-200">
+            <h2 class="text-lg font-semibold text-gray-900">Order Notes (Optional)</h2>
+          </div>
+          <div class="p-6">
+            <textarea
+              formControlName="notes"
+              rows="4"
+              placeholder="Any special instructions for your order..."
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            ></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column - Order Summary -->
+      <div class="mt-8 lg:mt-0 lg:col-span-5">
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 sticky top-8">
+          <div class="px-6 py-4 border-b border-gray-200">
+            <h2 class="text-lg font-semibold text-gray-900">Order Summary</h2>
+          </div>
+
+          <div class="p-6">
+            <!-- Cart Items -->
+            <div class="space-y-4 mb-6">
+              <div *ngFor="let item of cartItems" class="flex items-center space-x-3">
+                <div class="flex-shrink-0 w-12 h-12 bg-gray-200 rounded-lg overflow-hidden">
+                  <img
+                    [src]="item.productImage || 'assets/images/placeholder.jpg'"
+                    [alt]="item.productName"
+                    class="w-full h-full object-cover"
+                  >
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-sm font-medium text-gray-900 truncate">{{ item.productName }}</p>
+                  <p class="text-sm text-gray-600">Qty: {{ item.quantity }}</p>
+                </div>
+                <p class="text-sm font-medium text-gray-900">{{ item.totalPrice | currency:'USD' }}</p>
+              </div>
+            </div>
+
+            <!-- Price Breakdown -->
+            <div class="space-y-2 border-t border-gray-200 pt-4">
+              <div class="flex justify-between text-sm">
+                <span class="text-gray-600">Subtotal</span>
+                <span class="text-gray-900">{{ getSubtotal() | currency:'USD' }}</span>
+              </div>
+              <div class="flex justify-between text-sm">
+                <span class="text-gray-600">Shipping</span>
+                <span class="text-gray-900">
+                  {{ getShippingCost() === 0 ? 'Free' : (getShippingCost() | currency:'USD') }}
+                </span>
+              </div>
+              <div class="flex justify-between text-sm">
+                <span class="text-gray-600">Tax</span>
+                <span class="text-gray-900">{{ getTax() | currency:'USD' }}</span>
+              </div>
+              <div class="flex justify-between text-lg font-semibold border-t border-gray-200 pt-4">
+                <span class="text-gray-900">Total</span>
+                <span class="text-gray-900">{{ getTotal() | currency:'USD' }}</span>
+              </div>
+            </div>
+
+            <!-- Place Order Button -->
+            <button
+              (click)="placeOrder()"
+              [disabled]="placingOrder || checkoutForm.invalid || !useExistingAddress"
+              class="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed mt-6"
+            >
+              <span *ngIf="!placingOrder">Place Order</span>
+              <span *ngIf="placingOrder" class="flex items-center justify-center">
+                <i class="fas fa-spinner fa-spin mr-2"></i>
+                Processing...
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty Cart -->
+    <div *ngIf="!loading && cartItems.length === 0" class="text-center py-12">
+      <div class="max-w-md mx-auto">
+        <i class="fas fa-shopping-cart text-6xl text-gray-300 mb-4"></i>
+        <h2 class="text-2xl font-bold text-gray-900 mb-2">Your cart is empty</h2>
+        <p class="text-gray-600 mb-6">Add some items to your cart to checkout</p>
+        <button
+          routerLink="/products"
+          class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium"
+        >
+          Continue Shopping
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
